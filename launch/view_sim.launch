@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <!-- <node name="rviz_husky" pkg="rviz" type="rviz" args="-d $(find husky_viz)/rviz/robot.rviz" output="screen"/> -->
-  <node name="rviz_lidar" pkg="rviz" type="rviz" args="-d $(find velodyne_description)/rviz/example.rviz" output="screen"/>
-</launch>

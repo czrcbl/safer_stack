@@ -1,16 +1,18 @@
 <launch>
     <!-- <arg name="urdf_extras" default="$(optenv HUSKY_URDF_EXTRAS)"/> -->
-    <arg name="lidar_model" default='vlp16'/>
+    <!-- <arg name="lidar_model" default='vlp16'/> -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find safer_stack)/worlds/sand_mine.world"/>
     </include>
     <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
-        <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg lidar_model).urdf"></arg>
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/vlp_bumblebee.urdf"></arg>
+        <!-- <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg lidar_model).urdf"></arg> -->
         <!-- <arg name="robot_namespace" value="husky"></arg> -->
         <arg name="x" value="14.501486"></arg>
         <arg name="y" value="-38.408237"></arg>
         <arg name="z" value="17.819097"></arg>
         <arg name="yaw" value="90"></arg>
     </include>
-    <include file="$(find safer_stack)/launch/view_sim.launch"></include>
+    <!-- <include file="$(find safer_stack)/launch/view_sim.launch"></include> -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/viz_all.rviz" output="screen"/>
 </launch>

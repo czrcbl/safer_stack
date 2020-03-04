@@ -1,11 +1,11 @@
 <launch>
     <!-- <arg name="urdf_extras" default="$(optenv HUSKY_URDF_EXTRAS)"/> -->
-
+    <arg name="lidar_model" default='vlp16'/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find safer_stack)/worlds/sand_mine.world"/>
     </include>
     <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
-        <arg name="urdf_extras" value="$(find safer_stack)/urdf/vlp16.urdf"></arg>
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg lidar_model).urdf"></arg>
         <!-- <arg name="robot_namespace" value="husky"></arg> -->
         <arg name="x" value="14.501486"></arg>
         <arg name="y" value="-38.408237"></arg>

@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <!-- <include>
+      <uri>model://ground_plane</uri>
+    </include> -->
+
+    <!-- Testing the automatic population of objects -->
+      <model name="sand_mine">
+        <include>
+          <static>true</static>
+          <!-- <uri>model://model:/home/cezar/catkin_ws/src/safer_stack/models/sand_mine/model.sdf</uri> -->
+          <uri>model://sand_mine</uri>
+          <pose>0 0 0 0 0 0</pose>
+        </include>
+      </model>
+      
+
+  </world>
+</sdf>

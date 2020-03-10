@@ -9,6 +9,8 @@ project(safer_stack)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rospy
+  roscpp
+  pcl_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -202,3 +204,11 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+## Added by me
+
+add_executable(test_pcl src/test_pcl.cpp)
+target_link_libraries(test_pcl ${catkin_LIBRARIES})
+add_dependencies(test_pcl safer_stack_generate_messages_cpp)
+
+

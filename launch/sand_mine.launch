@@ -13,6 +13,10 @@
         <arg name="z" value="17.819097"></arg>
         <arg name="yaw" value="90"></arg>
     </include>
-    <!-- <include file="$(find safer_stack)/launch/view_sim.launch"></include> -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/viz_all.rviz" output="screen"/>
+    <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc"/>
+    <!-- <node pkg="pcl_ros" type="convert_image" name="convert_pointcloud_to_image" ns="cloud">
+        <param name="input" value="/velodyne_points"/>
+        <param name="output" value="/camera/depth/cloud_image"/>
+    </node> -->
 </launch>

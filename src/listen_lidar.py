@@ -2,11 +2,20 @@
 import rospy
 from sensor_msgs.msg import PointCloud2
 import ros_numpy
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def callback(data):
-    data = ros_numpy.numpify(data)
+    pass
+    # data = ros_numpy.numpify(data)
 
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.astype(int)[0])
+    # xyz_array = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(data) # Convert pointclud message to unstructured x,y,z coordinates
+    # coords_array = ros_numpy.point_cloud2.pointcloud2_to_array(data)
+    # rospy.loginfo(rospy.get_caller_id() + "I heard %s", coords_array[0, :])
+    # rospy.loginfo(rospy.get_caller_id() + "I heard %s", coords_array.shape)
+
     
 def listener():
 
@@ -20,6 +29,8 @@ def listener():
     rospy.Subscriber("/velodyne_points", PointCloud2, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
+    # cv2.imshow('Depth Image')
+    
     rospy.spin()
 
 if __name__ == '__main__':

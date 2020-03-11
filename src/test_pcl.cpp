@@ -86,8 +86,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
   // Do data processing here...
   // output = *input;
-  // output = voxel(input);
-  output = remove_outliers(input);
+  output = voxel(input);
+  // output = remove_outliers(input);
 
   std::cout << "Output width: " << output.width << "\n" << "Output heigth: " << output.height << "\n";
   // Publish the data.

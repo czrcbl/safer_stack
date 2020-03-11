@@ -12,16 +12,21 @@
       <uri>model://ground_plane</uri>
     </include> -->
 
-    <!-- Testing the automatic population of objects -->
-      <model name="sand_mine">
-        <include>
-          <static>true</static>
-          <!-- <uri>model://model:/home/cezar/catkin_ws/src/safer_stack/models/sand_mine/model.sdf</uri> -->
-          <uri>model://sand_mine</uri>
-          <pose>0 0 0 0 0 0</pose>
-        </include>
-      </model>
-      
+    <model name="sand_mine">
+      <include>
+        <static>true</static>
+        <uri>model://sand_mine</uri>
+        <pose>0 0 0 0 0 0</pose>
+      </include>
+    </model>
 
+    <model name="april_tag">
+      <include>
+        <static>true</static>
+        <uri>model://april_tag</uri>
+        <pose>10 -28 16.5 0 0 0</pose>
+      </include>
+    </model>
+     
   </world>
 </sdf>

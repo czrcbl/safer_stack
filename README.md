@@ -2,9 +2,14 @@
 
 ## Instalation
 
+Required packages:  
+`ros-melodic-husky-gazebo ros-melodic-velodyne-descriptio ros-melodic-apriltag-ros python3-empy
+`
+
+
 ```bash
 cd ~/catkin_ws/src
-git clone https://github.com/eric-wieser/ros_numpy
+# git clone https://github.com/eric-wieser/ros_numpy
 git clone https://github.com/ros-drivers/pointgrey_camera_driver
 ```
 

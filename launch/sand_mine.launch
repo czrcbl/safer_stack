@@ -19,4 +19,5 @@
         <param name="input" value="/velodyne_points"/>
         <param name="output" value="/camera/depth/cloud_image"/>
     </node> -->
+    <node ns="bumblebee2/left" pkg="apriltag_ros" name="apriltag_ros_continuous_node" type="apriltag_ros_continuous_node"></node>
 </launch>

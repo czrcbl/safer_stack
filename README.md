@@ -3,8 +3,7 @@
 ## Instalation
 
 Required packages:  
-`ros-melodic-husky-gazebo ros-melodic-velodyne-descriptio ros-melodic-apriltag-ros python3-empy
-`
+`ros-melodic-husky-gazebo ros-melodic-velodyne-* ros-melodic-apriltag-ros python3-empy`
 
 
 ```bash

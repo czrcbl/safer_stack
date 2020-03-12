@@ -4,6 +4,8 @@ import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist, Vector3 
 
+from utils import create_message
+
 def talker():
 
     pub = rospy.Publisher('/husky_velocity_controller/cmd_vel', Twist, queue_size=10)
@@ -11,20 +13,8 @@ def talker():
     rate = rospy.Rate(10)
     
     while not rospy.is_shutdown():
-
-        linear = Vector3()
-        linear.x = 1
-        linear.y = 0
-        linear.z = 0
-        angular = Vector3()
-        angular.x = 0
-        angular.y = 0
-        angular.z = 0
-
-        twist = Twist()
-        twist.linear = linear
-        twist.angular = angular
-
+        
+        twist = create_message([1,0,0])
         pub.publish(twist)
         # rospy.loginfo('Message sent!')
         rate.sleep()

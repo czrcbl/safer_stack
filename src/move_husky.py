@@ -12,11 +12,12 @@ def talker():
     rospy.init_node('Move', anonymous=True)
     rate = rospy.Rate(10)
     
+    twist = create_message([1,0,0])
+    
+    
     while not rospy.is_shutdown():
-        
-        twist = create_message([1,0,0])
-        pub.publish(twist)
         # rospy.loginfo('Message sent!')
+        pub.publish(twist)
         rate.sleep()
 
 if __name__ == '__main__':

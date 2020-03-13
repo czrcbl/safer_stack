@@ -1,0 +1,26 @@
+<launch>
+
+    <arg name="x" default="10"/>
+    <arg name="y" default="28"/>
+    <arg name="z" default="16.5"/>
+    <arg name="yaw" default="0"/>
+    <node name="spawn_tag" pkg="gazebo_ros" type="spawn_model"
+        args="-x $(arg x)
+              -y $(arg y)
+              -z $(arg z)
+              -Y $(arg yaw)
+              -sdf
+              -unpause
+              -file $(find safer_stack)/models/april_tag/model.sdf
+              -model april_tag" />
+
+    <rosparam command="load" file="$(find safer_stack)/config/tags.yaml" ns="apriltag_ros" />
+    
+    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_ros" clear_params="true" output="screen" >
+        <!-- Remap topics from those used in code to those on the ROS network -->
+        <remap from="image_rect" to="/bumblebee2/left/image_rect" />
+        <remap from="camera_info" to="/bumblebee2/left/camera_info" />
+        <param name="camera_frame" type="str" value="bumblebee2" />
+        <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
+    </node> 
+</launch>

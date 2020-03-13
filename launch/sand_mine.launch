@@ -1,49 +1,6 @@
 <launch>
-    <!-- <arg name="urdf_extras" default="$(optenv HUSKY_URDF_EXTRAS)"/> -->
-    <!-- <arg name="lidar_model" default='vlp16'/> -->
+    <arg name="world_name" default="$(find safer_stack)/worlds/sand_mine.world"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find safer_stack)/worlds/sand_mine.world"/>
+        <arg name="world_name" value="$(arg world_name)"/>
     </include>
-    <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
-        <arg name="urdf_extras" value="$(find safer_stack)/urdf/vlp_bumblebee.urdf"></arg>
-        <!-- <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg lidar_model).urdf"></arg> -->
-        <!-- <arg name="robot_namespace" value="husky"></arg> -->
-        <arg name="x" value="14.501486"></arg>
-        <arg name="y" value="-38.408237"></arg>
-        <arg name="z" value="17.819097"></arg>
-        <arg name="yaw" value="90"></arg>
-    </include>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/viz_all.rviz" output="screen"/>
-    <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc"/>
-    
-    <!-- <node pkg="pcl_ros" type="convert_image" name="convert_pointcloud_to_image" ns="cloud">
-        <param name="input" value="/velodyne_points"/>
-        <param name="output" value="/camera/depth/cloud_image"/>
-    </node> -->
-    
-    <!-- <node ns="bumblebee2/left" pkg="apriltag_ros" name="apriltag_ros_continuous_node" type="apriltag_ros_continuous_node"></node> -->
-    <!-- <rosparam command="load" ns="apriltag_ros_continuous_node">
-        remove_duplicates: false
-        standalone_tags:
-            [
-                {id: 0, size: 0.5, name: stop}
-            ]
-    </rosparam> -->
-
-    <rosparam command="load" file="$(find safer_stack)/config/tags.yaml" ns="apriltag_ros" />
-    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_ros" clear_params="true" output="screen" >
-        <!-- Remap topics from those used in code to those on the ROS network -->
-        <remap from="image_rect" to="/bumblebee2/left/image_rect" />
-        <remap from="camera_info" to="/bumblebee2/left/camera_info" />
-        <param name="camera_frame" type="str" value="bumblebee2" />
-        <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
-    </node>    
-    
-    
-    <!-- <include file="$(find apriltag_ros)/launch/continuous_detection.launch">
-        <arg name="node_namespace" default="apriltag_ros_continuous_node" />
-        <arg name="camera_name" value="/bumblebee2/left" />
-        <param name="remove_duplicates" value="false" />
-        <arg name="camera_frame" value="camera" />
-    </include> -->
 </launch>

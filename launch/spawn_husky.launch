@@ -1,0 +1,18 @@
+  <launch>
+
+    <arg name="robot_namespace" default="/"/>
+    <arg name="x" default="14.501486"/>
+    <arg name="y" default="-38.408237"/>
+    <arg name="z" default="17.819097"/>
+    <arg name="yaw" default="90.0"/>
+
+    <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/vlp_bumblebee.urdf"></arg>
+        <arg name="robot_namespace" value="$(arg robot_namespace)"></arg>
+        <arg name="x" value="$(arg x)"></arg>
+        <arg name="y" value="$(arg y)"></arg>
+        <arg name="z" value="$(arg z)"></arg>
+        <arg name="yaw" value="$(arg yaw)"></arg>
+    </include>
+
+</launch>

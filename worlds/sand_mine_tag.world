@@ -20,9 +20,17 @@
       </include>
     </model>
 
+    <model name="april_tag">
+      <include>
+        <static>true</static>
+        <uri>model://april_tag</uri>
+        <pose>10 -28 16.5 0 0 0</pose>
+      </include>
+    </model>
+
     <gui>
       <camera name="user_camera">
-        <pose>13 -41 20 0 0 -30</pose>
+        <pose>17 -41 20 0 0 -30</pose>
       </camera>
     </gui>   
      

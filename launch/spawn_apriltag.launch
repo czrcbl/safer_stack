@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <include file="$(find safer_stack)/launch/spawn_sdf.launch">
+        <arg name="robot_name" value="april_tag" />
+        <arg name="x" value="10.0" />
+        <arg name="y" value="-28.0" />
+        <arg name="z" value="16.5" />
+        <arg name="roll" value="0"/>
+        <arg name="pitch" value="0"/>
+        <arg name="yaw" value="0.0" />
+        <arg name="sdf_robot_file" value="$(find safer_stack)/models/april_tag/model.sdf" />
+    </include>
+
+    <rosparam command="load" file="$(find safer_stack)/config/tags.yaml" ns="apriltag_ros" />
+    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_ros" clear_params="true" output="screen" >
+        <!-- Remap topics from those used in code to those on the ROS network -->
+        <remap from="image_rect" to="/bumblebee2/left/image_rect" />
+        <remap from="camera_info" to="/bumblebee2/left/camera_info" />
+        <param name="camera_frame" type="str" value="bumblebee2" />
+        <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
+    </node> 
+</launch>

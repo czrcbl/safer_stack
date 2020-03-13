@@ -15,8 +15,11 @@ def callback(data):
         x, y, z = position.x, position.y, position.z
         d = np.sqrt(x**2 + y**2 + z**2)
         distances.append(d)
-        
-    d = min(distances)
+    
+    if len(distances) > 0:
+        d = min(distances)
+    else:
+        d = 1000
     print(d)
     if d < 3:
         twist = create_message([0, 0, 0])

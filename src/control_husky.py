@@ -1,43 +1,32 @@
 #!/usr/bin/python
-import rospy 
+import rospy
+from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
-from apriltag_ros.msg import AprilTagDetectionArray
 import numpy as np
 from utils import create_message
 
 
 def callback(data):
-    # global twist
-    distances = []
-    for item in data.detections:
-        # print(item.pose.pose)
-        position = item.pose.pose.pose.position
-        x, y, z = position.x, position.y, position.z
-        d = np.sqrt(x**2 + y**2 + z**2)
-        distances.append(d)
-    
-    if len(distances) > 0:
-        d = min(distances)
-    else:
-        d = 1000
-    print(d)
-    if d < 3:
+
+    d = data.data
+    th = 4
+    vel = max([min([d - th, 1]), 0.2])
+    if np.isnan(d):
+        twist = create_message([1, 0, 0])
+    elif d < 4:
         twist = create_message([0, 0, 0])
     else:
-        twist = create_message([1, 0, 0])
-    pub.publish(twist)
+        twist = create_message([vel, 0, 0])
+    pub_husky.publish(twist)
 
 
 def main():
 
-    global pub
-
+    global pub_husky
     rospy.init_node('ControlHusky', anonymous=True)
-    pub = rospy.Publisher('/husky_velocity_controller/cmd_vel', Twist, queue_size=10)
-    rospy.Subscriber('/tag_detections', AprilTagDetectionArray, callback)
+    pub_husky = rospy.Publisher('/husky_velocity_controller/cmd_vel', Twist, queue_size=10)
+    rospy.Subscriber('/edge_distance', Float32, callback)
     rate = rospy.Rate(10)
-    twist = create_message([1, 0, 0])
-    pub.publish(twist)
     while not rospy.is_shutdown():
         # rospy.loginfo('Message sent!')
         rate.sleep()

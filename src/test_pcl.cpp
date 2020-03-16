@@ -36,7 +36,6 @@
 
 ros::Publisher pub;
 
-
 // sensor_msgs::PointCloud2 remove_outliers(const sensor_msgs::PointCloud2ConstPtr& input) 
 // {
 //   pcl::PCLPointCloud2<pcl::PointXYZ>* cloud = new pcl::PCLPointCloud2;
@@ -66,7 +65,7 @@ sensor_msgs::PointCloud2 voxel(const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::PCLPointCloud2 cloud_filtered;
 
   pcl_conversions::toPCL(*input, *cloud);
-  
+
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
   sor.setInputCloud (cloudPtr);
   sor.setLeafSize (0.1, 0.1, 0.1);
@@ -78,8 +77,49 @@ sensor_msgs::PointCloud2 voxel(const sensor_msgs::PointCloud2ConstPtr& input)
   return output;
 }
 
-void 
-cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
+
+void test(const sensor_msgs::PointCloud2ConstPtr& input)
+{
+  pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;
+  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
+  pcl_conversions::toPCL(*input, *cloud);
+
+  // // conversion
+  // pcl::PointCloud<pcl::PointXYZ>::Ptr vertices(new pcl::PointCloud<pcl::PointXYZ>);
+  // pcl::fromPCLPointCloud2( mesh.cloud, *vertices ); 
+
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloudxyz(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::fromPCLPointCloud2(*cloud, *cloudxyz);
+
+  // for(int i=0; i < cloudxyz.; i++) {
+  //   for(int j=0; j < cloud)
+  // }
+
+// // access each vertex 
+//   for( int idx = 0; idx < vertices->size(); idx++ )
+//   {
+//     pcl::PointXYZ v = vertices->points[ idx ];
+
+//     float x = v._PointXYZ::data[ 0 ];
+//     float y = v._PointXYZ::data[ 1 ];
+//     float z = v._PointXYZ::data[ 2 ];
+//   }
+
+
+  // pcl::PCLPointCloud2 cloud = *cloud;
+  // int height = cloud.height;
+  // int width = cloud.width;
+  
+  // for(int i = 0; i < cloud->header->height; i+=1){
+  //     for( int j = 0; j < cloud.header.width; j+=1){
+  //         std::cout << cloud.at(i,j);
+
+  //     }
+  // }
+
+}
+
+void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
   // Create a container for the data.
   sensor_msgs::PointCloud2 output;
@@ -87,6 +127,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   // Do data processing here...
   // output = *input;
   output = voxel(input);
+  // output = test(input);
   // output = remove_outliers(input);
 
   std::cout << "Output width: " << output.width << "\n" << "Output heigth: " << output.height << "\n";

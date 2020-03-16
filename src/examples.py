@@ -20,3 +20,9 @@ rospy.spin()
 
 # LIDAR Seg
 xyz_array = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(data) # Convert pointclud message to unstructured x,y,z coordinates
+
+
+    data = ros_numpy.numpify(data)
+
+    xyz_array = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(data) # Convert pointclud message to unstructured x,y,z coordinates
+    print(xyz_array.shape)

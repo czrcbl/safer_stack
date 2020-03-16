@@ -8,63 +8,145 @@ import ros_numpy
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
-bridge = CvBridge()
 
 
-def callback(data_img, data_cloud):
-    
-    h = data_cloud.height
-    w = data_cloud.width
-    
-    coords = np.zeros(shape=(h, w, 3))
-    for n, point in enumerate(pc2.read_points(data_cloud, skip_nans=False)):
-        # print(point[0]) 
-        j = n % w
-        i = n // w
-        coords[i, j, :] = point[:3]
+class DistanceCloud:
 
-    # print(np.sum(np.isnan(coords)))
-    coords[np.isnan(coords)] = 1000
-    depth = np.sqrt((coords ** 2).sum(axis=-1))
-    # print(depth.min(), depth.mean(), depth.max())
-    # kernel = np.ones((5,5),np.float32)/25
-    # depth = cv2.filter2D(depth,-1,kernel)
-    th = 10
-    max_dist = 20
-    diff_arr = np.abs(depth[1:,:] - depth[:-1,:])
-    buff = np.zeros(shape=depth.shape)
-    buff[1:, :] = diff_arr
-    # mask_arr = np.logical_and(buff > th, depth < max_dist)
-    mask_arr = buff > th
-    mask_img = mask_arr.astype(np.float32) 
-    # print(mask_arr.sum())
-    
-    ## Process Image
-    img = bridge.imgmsg_to_cv2(data_img, desired_encoding="passthrough")
-    edges = cv2.Canny(img,50,200)
-    
-    # interzone = np.logical_and(edges, mask_img).astype('float')
-    interzone = edges
-    # rows, cols = np.nonzero(interzone)
-    # height = int(np.median(rows))
-    
-    distances = []
-    # for i in range(depth.shape[1]):
-    #     distances.append(depth[height, i])
-    for d in depth[interzone.astype(bool)]:
-        distances.append(d)
+    def __init__(self):
 
-    d = min(distances)
-    pub_dist.publish(d)
-    # print('closest point', min(distances))
+        self.raw_img = None
+        self.rect_img = None
+        self.cloud = None
+
+        self.d = None
+        self.crest = None
+
+        self.bridge = CvBridge()
+        self.pub_dist = rospy.Publisher('/edge_distance', Float32, queue_size=10)
+        self.pub_img = rospy.Publisher('/image_edge_highlighted', Image, queue_size=10)
+        
+        rospy.Subscriber('/bumblebee2/left/image_raw', Image, self.raw_img_callback)
+        rospy.Subscriber('/bumblebee2/left/image_rect', Image, self.rect_img_callback)
+        rospy.Subscriber('/bumblebee2/points2', PointCloud2, self.points2_callback)
+
+    def raw_img_callback(self, data):
+        self.raw_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
+
+    def rect_img_callback(self, data):
+        self.rect_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
+
+    def points2_callback(self, data):
+        h = data.height
+        w = data.width
     
-    cv2.imshow('Mask', interzone)
-    cv2.waitKey(3)
+        coords = np.zeros(shape=(h, w, 3))
+        for n, point in enumerate(pc2.read_points(data, skip_nans=False)):
+            # print(point[0]) 
+            j = n % w
+            i = n // w
+            coords[i, j, :] = point[:3]
+        
+        self.cloud = coords
+
+        self.detect_crest()
+
+    def detect_crest(self):
+
+        def generate_contour(self, mask):
+            out = np.zeros(shape=(mask.shape[1],))
+            th = mask.shape[0] / 10.0
+            cols, rows = np.nonzero(mask.T)
+            height = int(np.median(rows))
+            cols_prev = 0
+            i = 0
+            check = np.logical_and(height - th < rows, height + th > rows)
+            while i < len(cols):
+                c = cols[i]
+                r = rows[i]
+                ch = check[i]
+                if ch:
+                    out[cols_prev: c + 1] = r
+                    cols_prev = c + 1
+                i += 1
+                # n = np.sum(c == cols)
+                # for j in range(n):
+                #     if (height - th < rows[i + j]) and (height + th > rows[i + j]):
+                #         out[cols_prev: c + 1] = rows[i + j]
+                #         cols_prev = c + 1
+                #         i += n
+                # else: 
+                #     if (height - th < rows[i]) and (height + th > rows[i]):
+                #         out[cols_prev: c + 1] = r
+                #         cols_prev = c + 1
+                #         i += 1
+            return out.astype(int)
+            # print(np.sum(np.isnan(coords)))
+        cloud = self.cloud
+
+        cloud[np.isnan(cloud)] = 30
+        depth = np.sqrt((cloud ** 2).sum(axis=-1))
+        # print(depth.min(), depth.mean(), depth.max())
+        # kernel = np.ones((5,5),np.float32)/25
+        # depth = cv2.filter2D(depth,-1,kernel)
+        th = 10
+        max_dist = 20
+        diff_arr = np.abs(depth[1:,:] - depth[:-1,:])
+        buff = np.zeros(shape=depth.shape)
+        buff[1:, :] = diff_arr
+        # mask_arr = np.logical_and(buff > th, depth < max_dist)
+        mask_arr = buff > th
+        mask_img = mask_arr.astype(np.float32) 
+        # print(mask_arr.sum())
+        
+        ## Process Image
+        
+        edges = cv2.Canny(self.rect_img, 50, 200)
+        
+        interzone = np.logical_and(edges, mask_img).astype('int')
+
+        out = generate_contour(interzone)
+        self.crest = out
+        # print(out)  
+        # interzone = edges
+        # rows, cols = np.nonzero(interzone)
+        # height = int(np.median(rows))
+        
+        distances = []
+        # for i in range(depth.shape[1]):
+        #     distances.append(depth[height, i])
+        # for d in depth[interzone.astype(bool)]:
+        #     distances.append(d)
+        for d in depth[out, np.arange(depth.shape[1])]:
+            distances.append(d)
+
+        d = min(distances)
+        self.d = d
+
+        # print('closest point', min(distances))
+
+
+    def draw_crest(self):
+        if self.crest is None: return
+        raw_img = np.array(self.raw_img)
+        raw_img[self.crest, np.arange(raw_img.shape[1]), :] = np.array([255, 0, 0])
+        # self.raw_img_draw = raw_img
+        return raw_img
+
+    def publish(self):
+        
+        if (self.d is None) or (self.crest is None): return
+
+        raw_img_draw = self.draw_crest()
+        out_img_msg = self.bridge.cv2_to_imgmsg(raw_img_draw)
+        self.pub_img.publish(out_img_msg)
+
+        dmsg = Float32()
+        dmsg.data = self.d
+        self.pub_dist.publish(dmsg)
 
     
 def listener():
 
-    global pub_dist
     # In ROS, nodes are uniquely named. If two nodes with the same
     # name are launched, the previous one is kicked off. The
     # anonymous=True flag means that rospy will choose a unique
@@ -72,18 +154,13 @@ def listener():
     # run simultaneously.
     rospy.init_node('DistanceCloud', anonymous=True)
 
-    # rospy.Subscriber("/bumblebee2/points2", PointCloud2, callback)
-    pub_dist = rospy.Publisher('/edge_distance', Float32, queue_size=10)
-    image_sub = message_filters.Subscriber('/bumblebee2/left/image_rect', Image)
-    cloud_sub = message_filters.Subscriber('/bumblebee2/points2', PointCloud2)
-
-    ts = message_filters.TimeSynchronizer([image_sub, cloud_sub], 10)
-    ts.registerCallback(callback)
-
-    # spin() simply keeps python from exiting until this node is stopped
-    # cv2.imshow('Depth Image')
+    distcloud = DistanceCloud()
     
-    rospy.spin()
+    rate = rospy.Rate(30)
+    while not rospy.is_shutdown():
+        # rospy.loginfo('Message sent!')
+        distcloud.publish()
+        rate.sleep()
 
 if __name__ == '__main__':
     listener()

@@ -14,7 +14,7 @@ class Interface:
 
     def __init__(self):
         rospy.Subscriber('/edge_distance', Float32, self.distance_callback)
-        rospy.Subscriber('/bumblebee2/left/image_raw', Image, self.image_callback)
+        rospy.Subscriber('/image_edge_highlighted', Image, self.image_callback)
         self.bridge = CvBridge()
         self.image = None
         self.d = None

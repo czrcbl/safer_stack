@@ -52,7 +52,7 @@ class DistanceCloud:
 
     def detect_crest(self):
 
-        def generate_contour(self, mask):
+        def generate_contour(mask):
             out = np.zeros(shape=(mask.shape[1],))
             th = mask.shape[0] / 10.0
             cols, rows = np.nonzero(mask.T)

@@ -7,13 +7,20 @@ import numpy as np
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
+import os
+
+from detectron2.config import get_cfg
+from detectron2.engine import DefaultPredictor
+from detectron2 import model_zoo
 
 
-class DistanceCloud:
+class DistanceNN:
 
     def __init__(self):
 
-        self.raw_img = None
+        self.predictor = self.load_predictor()
+
+        self.color_img = None
         self.rect_img = None
         self.cloud = None
 
@@ -24,12 +31,13 @@ class DistanceCloud:
         self.pub_dist = rospy.Publisher('/edge_distance', Float32, queue_size=10)
         self.pub_img = rospy.Publisher('/image_edge_highlighted', Image, queue_size=10)
         
-        rospy.Subscriber('/bumblebee2/left/image_raw', Image, self.raw_img_callback)
+        rospy.Subscriber('/bumblebee2/left/image_rect_color', Image, self.color_img_callback)
         rospy.Subscriber('/bumblebee2/left/image_rect', Image, self.rect_img_callback)
         rospy.Subscriber('/bumblebee2/points2', PointCloud2, self.points2_callback)
 
-    def raw_img_callback(self, data):
-        self.raw_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
+        
+    def color_img_callback(self, data):
+        self.color_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
 
     def rect_img_callback(self, data):
         self.rect_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
@@ -48,6 +56,28 @@ class DistanceCloud:
         self.cloud = coords
 
         self.detect_crest()
+
+    def load_predictor(self):
+
+        project_path = os.path.abspath(os.path.realpath(os.path.dirname(os.path.dirname(__file__))))
+        model_path = os.path.join(project_path, 'data/0model_final.pth')
+        cfg = get_cfg()
+        cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
+        cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1  # only has one class (ballon)
+        # cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
+        cfg.MODEL.WEIGHTS = model_path
+        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5   # set the testing threshold for this model
+        predictor = DefaultPredictor(cfg)
+
+        return predictor
+
+    def predict_mask(self, im):
+        outputs = self.predictor(im)
+        inst = outputs['instances']
+        masks = inst.get('pred_masks')
+        mask = masks.sum(axis=0) > 0
+        masknp = mask.cpu().numpy()
+        return masknp
 
     def detect_crest(self):
 
@@ -82,14 +112,11 @@ class DistanceCloud:
             # print(np.sum(np.isnan(coords)))
         cloud = self.cloud
 
-        # cloud[np.isnan(cloud)] = 30
+        cloud[np.isnan(cloud)] = 30
         depth = np.sqrt((cloud ** 2).sum(axis=-1))
-        depthr = np.array(depth)
-        depthr[np.isnan(depthr)] = 200
         # print(depth.min(), depth.mean(), depth.max())
-        kernel = np.ones((50,50),np.float32)/(50*50)
-        depthf = cv2.filter2D(depth,-1,kernel)
-        # depth =depthf
+        # kernel = np.ones((5,5),np.float32)/25
+        # depth = cv2.filter2D(depth,-1,kernel)
         th = 10
         max_dist = 20
         diff_arr = np.abs(depth[1:,:] - depth[:-1,:])
@@ -104,10 +131,12 @@ class DistanceCloud:
         
         edges = cv2.Canny(self.rect_img, 50, 200)
         
-        interzone = np.logical_and(edges, mask_img).astype('int')
+        ## Process o NN:
+        mask_nn = self.predict_mask(self.color_img[:,:,::-1])
+        interzone = np.logical_and(mask_nn, edges)
+        # interzone = np.logical_and(edges, mask_img).astype('int')
 
         out = generate_contour(interzone)
-        # out =  np.zeros(shape=(depth.shape[0],), dtype=int)
         self.crest = out
         # print(out)  
         # interzone = edges
@@ -122,23 +151,22 @@ class DistanceCloud:
         for d in depth[out, np.arange(depth.shape[1])]:
             distances.append(d)
 
-        distances = [10,10,10]
         d = min(distances)
         self.d = d
 
         # print('closest point', min(distances))
-
-        # cv2.imshow('Depth NaN', np.isnan(depth).astype('float'))
-        cv2.imshow('Depth NaN', np.isnan(depth).astype(float))
+        img = np.array(self.color_img)
+        img[mask_nn] = (0,0,255)
+        cv2.imshow('Segmentation', img)
         cv2.waitKey(3)
+
 
     def draw_crest(self):
         if self.crest is None: return
-        raw_img = np.array(self.raw_img)
-        raw_img[self.crest, np.arange(raw_img.shape[1]), :] = np.array([255, 0, 0])
-        self.raw_img_draw = raw_img
-        return self.raw_img
-        
+        color_img = np.array(self.color_img)
+        color_img[self.crest, np.arange(color_img.shape[1]), :] = np.array([255, 0, 0])
+        # self.raw_img_draw = raw_img
+        return color_img
 
     def publish(self):
         
@@ -162,12 +190,12 @@ def listener():
     # run simultaneously.
     rospy.init_node('DistanceCloud', anonymous=True)
 
-    distcloud = DistanceCloud()
+    distnn = DistanceNN()
     
     rate = rospy.Rate(30)
     while not rospy.is_shutdown():
         # rospy.loginfo('Message sent!')
-        distcloud.publish()
+        distnn.publish()
         rate.sleep()
 
 if __name__ == '__main__':

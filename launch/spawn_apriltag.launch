@@ -2,7 +2,7 @@
 <launch>
     <include file="$(find safer_stack)/launch/spawn_sdf.launch">
         <arg name="robot_name" value="april_tag" />
-        <arg name="x" value="10.0" />
+        <arg name="x" value="8.0" />
         <arg name="y" value="-28.0" />
         <arg name="z" value="16.5" />
         <arg name="roll" value="0"/>

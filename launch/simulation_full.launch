@@ -9,16 +9,18 @@
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/viz_all.rviz" output="screen"/>
 
-    <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc"/>
+    <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc">
+        <param name="disparity_range" value="64"/>
+    </node>
     
 
-    <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager"> 
+    <!-- <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager"> 
     </node>
 
     <node pkg="nodelet" type="nodelet" name="outlier_filter" args="load pcl/RadiusOutlierRemoval nodelet_manager" >
         <remap from="~input" to="/bumblebee2/points2" />
         <remap from="~output" to="/points2_filtered" />
-    </node>
+    </node> -->
 
     <!-- <node pkg="nodelet" type="nodelet" name="outlier_filter" args="load pcl/StatisticalOutlierRemoval nodelet_manager" >
         <param name="mean_k" type="int" value="2" />

@@ -2,7 +2,8 @@
 
     <arg name="robot_namespace" default="/"/>
     <arg name="x" default="14.501486"/>
-    <arg name="y" default="-38.408237"/>
+    <!-- <arg name="y" default="-38.408237"/> -->
+    <arg name="y" default="-42.408237"/>
     <arg name="z" default="17.819097"/>
     <arg name="yaw" default="90.0"/>
 

@@ -22,13 +22,6 @@ def callback(data):
     else:
         d = np.float('nan')
 
-    th = 4
-    vel = max([min([d - th, 1]), 0.2])
-    # print(d)
-    if d < 4:
-        twist = create_message([0, 0, 0])
-    else:
-        twist = create_message([vel, 0, 0])
     pub_dist.publish(d)
 
 

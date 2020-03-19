@@ -12,6 +12,8 @@
     <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc">
         <param name="disparity_range" value="64"/>
     </node>
+
+    <node pkg="safer_stack" name="tf_pointclouds" type="tf_pointclouds.py" />
     
 
     <!-- <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager"> 

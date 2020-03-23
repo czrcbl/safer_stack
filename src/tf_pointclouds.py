@@ -23,7 +23,7 @@ class TransformPointCloud:
 
     def convert_point_cloud(self, msg):
         lookup_time = msg.header.stamp
-        target_frame = msg.header.frame_id 
+        target_frame = 'base_link'
         source_frame = msg.header.frame_id
         try:
             trans = self.tf_buffer.lookup_transform(target_frame, source_frame, lookup_time,

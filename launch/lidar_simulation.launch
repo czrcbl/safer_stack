@@ -8,7 +8,7 @@
     <include file="$(find safer_stack)/launch/sand_mine.launch"></include>
 
     <include file="$(find safer_stack)/launch/spawn_husky.launch">
-        <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg lidar_model).urdf.xacro" />
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg lidar_model)_support.urdf.xacro" />
     </include>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/viz_lidar.rviz" output="screen"/>
@@ -16,6 +16,8 @@
     <node name="convert_pc" pkg="safer_stack" type="tf_pointclouds.py">
         <param name="only_lidar" type="bool" value="True" />
     </node>
+
+    <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
 
 
     <!-- <group unless="$(arg tag)">

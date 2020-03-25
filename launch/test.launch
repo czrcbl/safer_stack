@@ -1,0 +1,9 @@
+<launch>
+
+    <include file="$(find safer_stack)/launch/sand_mine.launch"></include>
+    
+    <include file="$(find safer_stack)/launch/spawn_husky.launch">
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/vlp16_support.urdf.xacro" />
+    </include>
+
+</launch>

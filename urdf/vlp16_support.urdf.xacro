@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="vlp16">
+ <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+ <!-- <vlp16 gpu="false"/> -->
+  <VLP-16 parent="support_base" name="velodyne" topic="/velodyne_points" hz="10" samples="440">
+    <!-- <origin xyz="0.2206 0.0 0.00635" rpy="0 0 0" /> -->
+    <origin xyz="0.0 0.0 2.00635" rpy="0 0 0" />
+  </VLP-16>
+
+<material name="black">
+    <color rgba="0.0 0.0 1.0 1"/>
+  </material>
+
+  <link name="support_base">
+    <visual>
+      <geometry>
+        <cylinder length="2.0" radius="0.06"/>
+      </geometry>
+      <origin xyz="0.0 0.0 1.00635" rpy="0 0 0" />
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_support" type="fixed">
+    <parent link="top_plate_link"/>
+    <child link="support_base"/>
+    <origin xyz="0.0 0.0 0.00635" rpy="0 0 0" />
+  </joint>
+
+    <!-- <joint name="support_sensor" type="fixed">
+        <parent link="support_base"/>
+        <child link="support_base"/>
+    </joint> -->
+
+</robot>

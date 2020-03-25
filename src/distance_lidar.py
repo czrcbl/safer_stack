@@ -66,7 +66,7 @@ class DistanceCloud:
 
     def detect_crest(self):
         
-        th = 10
+        th = rospy.get_param('xdiff_threshold')
 
         cloud = self.cloud.squeeze()
         # print(cloud.shape)

@@ -15,7 +15,7 @@ class HuskyControl:
     
     def callback(self, data):
         d = data.data
-        th = 4
+        th = rospy.get_param('stop_distance', 7)
         vel = max([min([d - th, 1]), 0.2])
         if np.isnan(d):
             twist = create_message([1, 0, 0])

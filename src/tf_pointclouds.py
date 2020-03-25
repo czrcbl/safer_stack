@@ -11,15 +11,20 @@ from tf2_sensor_msgs.tf2_sensor_msgs import do_transform_cloud
 
 
 class TransformPointCloud:
-    def __init__(self):
+    def __init__(self, only_lidar=False, only_camera=False):
         self.tf_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(12))
         self.tl = tf2_ros.TransformListener(self.tf_buffer)
-        self.pub_camera = rospy.Publisher("/bumblebee2/point_cloud_transformed", PointCloud2, queue_size=2)
-        self.pub_lidar = rospy.Publisher("/velodyne/point_cloud_transformed", PointCloud2, queue_size=2)
-        self.sub_camera = rospy.Subscriber("/bumblebee2/points2", PointCloud2,
-                                    self.camera_callback, queue_size=2)
-        self.sub_lidar = rospy.Subscriber("/velodyne_points", PointCloud2,
-                                    self.lidar_callback, queue_size=2)
+        
+        
+        if not only_lidar:
+            self.pub_camera = rospy.Publisher("/bumblebee2/point_cloud_transformed", PointCloud2, queue_size=2)
+            self.sub_camera = rospy.Subscriber("/bumblebee2/points2", PointCloud2,
+                                        self.camera_callback, queue_size=2)
+
+        if not only_camera:
+            self.pub_lidar = rospy.Publisher("/velodyne/point_cloud_transformed", PointCloud2, queue_size=2)
+            self.sub_lidar = rospy.Subscriber("/velodyne_points", PointCloud2,
+                                        self.lidar_callback, queue_size=2)
 
     def convert_point_cloud(self, msg):
         lookup_time = msg.header.stamp
@@ -49,6 +54,8 @@ class TransformPointCloud:
         self.pub_lidar.publish(cloud_out)
 
 if __name__ == '__main__':
+    only_lidar = rospy.get_param('only_lidar', False)
+    only_camera = rospy.get_param('only_lidar', False)
     rospy.init_node('transform_point_cloud')
-    transform_point_cloud = TransformPointCloud()
+    transform_point_cloud = TransformPointCloud(only_lidar=only_lidar, only_camera=only_camera)
     rospy.spin()

@@ -19,7 +19,7 @@ class HuskyControl:
         vel = max([min([d - th, 1]), 0.2])
         if np.isnan(d):
             twist = create_message([1, 0, 0])
-        elif d < 4:
+        elif d < th:
             twist = create_message([0, 0, 0])
         else:
             twist = create_message([vel, 0, 0])

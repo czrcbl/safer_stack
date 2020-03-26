@@ -14,7 +14,7 @@ class DistanceCloud:
 
         self.cloud = None
 
-        self.d = None
+        self.d = np.float('nan')
         self.crest = None
 
         self.pub_dist = rospy.Publisher('/edge_distance', Float32, queue_size=10)

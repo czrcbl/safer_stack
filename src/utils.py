@@ -85,7 +85,6 @@ class BaseAlgorithm:
 
         self.camera_cloud = pointcloud2_2_npxyz(data)
 
-
     def detect_crest(self):
         pass
 

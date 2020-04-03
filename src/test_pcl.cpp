@@ -1,25 +1,3 @@
-// #include <ros/ros.h>
-// #include <pcl_ros/point_cloud.h>
-// #include <pcl/point_types.h>
-// #include <boost/foreach.hpp>
-
-// typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
-
-// void callback(const PointCloud::ConstPtr& msg)
-// {
-//   printf ("Cloud: width = %d, height = %d\n", msg->width, msg->height);
-// //   BOOST_FOREACH (const pcl::PointXYZ& pt, msg->points)
-//     // printf ("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
-// }
-
-// int main(int argc, char** argv)
-// {
-//   ros::init(argc, argv, "test_pcl");
-//   ros::NodeHandle nh;
-//   ros::Subscriber sub = nh.subscribe<PointCloud>("/bumblebee2/points2", 1, callback);
-//   ros::spin();
-// }
-
 #include <ros/ros.h>
 // PCL specific includes
 #include <sensor_msgs/PointCloud2.h>
@@ -36,27 +14,26 @@
 
 ros::Publisher pub;
 
-// sensor_msgs::PointCloud2 remove_outliers(const sensor_msgs::PointCloud2ConstPtr& input) 
-// {
-//   pcl::PCLPointCloud2<pcl::PointXYZ>* cloud = new pcl::PCLPointCloud2;
-//   pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
-//   pcl::PCLPointCloud2<pcl::PointXYZ> cloud_filtered;
+sensor_msgs::PointCloud2 remove_statistical_outliers(const sensor_msgs::PointCloud2ConstPtr& input) 
+{
+  pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;
+  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
+  pcl::PCLPointCloud2 cloud_filtered;
 
-//   pcl_conversions::toPCL(*input, *cloud);
+  pcl_conversions::toPCL(*input, *cloud);
 
-//   // Create the filtering object
-//   pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-//   sor.setInputCloud (cloud);
-//   sor.setMeanK (50);
-//   sor.setStddevMulThresh (1.0);
-//   sor.filter (cloud_filtered);
+  // Create the filtering object
+  pcl::StatisticalOutlierRemoval<pcl::PCLPointCloud2> sor;
+  sor.setInputCloud(cloudPtr);
+  sor.setMeanK (50);
+  sor.setStddevMulThresh (1.0);
+  sor.filter (cloud_filtered);
 
-//   sensor_msgs::PointCloud2 output;
-//   pcl_conversions::fromPCL(cloud_filtered, output);
+  sensor_msgs::PointCloud2 output;
+  pcl_conversions::fromPCL(cloud_filtered, output);
 
-//   return output;
-
-// }
+  return output;
+}
 
 sensor_msgs::PointCloud2 voxel(const sensor_msgs::PointCloud2ConstPtr& input) 
 {
@@ -78,47 +55,6 @@ sensor_msgs::PointCloud2 voxel(const sensor_msgs::PointCloud2ConstPtr& input)
 }
 
 
-void test(const sensor_msgs::PointCloud2ConstPtr& input)
-{
-  pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;
-  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
-  pcl_conversions::toPCL(*input, *cloud);
-
-  // // conversion
-  // pcl::PointCloud<pcl::PointXYZ>::Ptr vertices(new pcl::PointCloud<pcl::PointXYZ>);
-  // pcl::fromPCLPointCloud2( mesh.cloud, *vertices ); 
-
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloudxyz(new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::fromPCLPointCloud2(*cloud, *cloudxyz);
-
-  // for(int i=0; i < cloudxyz.; i++) {
-  //   for(int j=0; j < cloud)
-  // }
-
-// // access each vertex 
-//   for( int idx = 0; idx < vertices->size(); idx++ )
-//   {
-//     pcl::PointXYZ v = vertices->points[ idx ];
-
-//     float x = v._PointXYZ::data[ 0 ];
-//     float y = v._PointXYZ::data[ 1 ];
-//     float z = v._PointXYZ::data[ 2 ];
-//   }
-
-
-  // pcl::PCLPointCloud2 cloud = *cloud;
-  // int height = cloud.height;
-  // int width = cloud.width;
-  
-  // for(int i = 0; i < cloud->header->height; i+=1){
-  //     for( int j = 0; j < cloud.header.width; j+=1){
-  //         std::cout << cloud.at(i,j);
-
-  //     }
-  // }
-
-}
-
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
   // Create a container for the data.
@@ -126,7 +62,9 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
   // Do data processing here...
   // output = *input;
+  
   output = voxel(input);
+  output = remove_statistical_outliers(output)
   // output = test(input);
   // output = remove_outliers(input);
 
@@ -139,14 +77,14 @@ int
 main (int argc, char** argv)
 {
   // Initialize ROS
-  ros::init (argc, argv, "pcl_test");
+  ros::init (argc, argv, "pcl_test", ros::init_options::AnonymousName);
   ros::NodeHandle nh;
 
   // Create a ROS subscriber for the input point cloud
   ros::Subscriber sub = nh.subscribe ("/bumblebee2/points2", 1, cloud_cb);
 
   // Create a ROS publisher for the output point cloud
-  pub = nh.advertise<sensor_msgs::PointCloud2> ("/test_pcl/output", 1);
+  pub = nh.advertise<sensor_msgs::PointCloud2> ("/bumblebee2/points2_voxel", 1);
 
   // Spin
   ros::spin ();

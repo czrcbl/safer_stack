@@ -8,9 +8,9 @@
     </include>
 
     <!-- A ground plane -->
-    <!-- <include>
+    <include>
       <uri>model://ground_plane</uri>
-    </include> -->
+    </include>
 
     <model name="sand_mine">
       <include>

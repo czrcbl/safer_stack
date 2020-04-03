@@ -37,7 +37,7 @@ class Interface:
         d = self.d
         color = (255,0,0)
         font_scale = 2
-        cv2.putText(image, 'Distance: {:.2f}'.format(d), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color)
+        cv2.putText(image, 'Distance: {:.2f}'.format(d), (100, 150), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color)
         
         return image
 

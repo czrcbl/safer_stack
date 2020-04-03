@@ -19,10 +19,17 @@
         <param name="speckle_size" value="100" />
     </node>
 
+    <!-- <node name="voxel_filter" pkg="safer_stack" type="test_pcl"/> -->
+    <include file="$(find safer_stack)/launch/pcl_filters.launch" />
+    
     <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
 
     <node name="convert_pc" pkg="safer_stack" type="tf_pointclouds.py">
-        <param name="only_lidar" type="bool" value="True" />
+        <remap from="input_lidar" to="/velodyne_points"/>
+        <remap from="output_lidar" to="/velodyne/point_cloud_transformed"/>
+        <remap from="input_camera" to="/statistical_outlier/output"/>
+        <remap from="output_camera" to="/bumblebee2/point_cloud_transformed"/>
+        <!-- <param name="only_lidar" type="bool" value="true" /> -->
     </node>
 
     <node pkg="safer_stack" name="interface" type="interface.py" output="screen"/>

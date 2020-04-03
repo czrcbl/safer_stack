@@ -19,6 +19,10 @@
       <origin xyz="0.0 0.0 1.00635" rpy="0 0 0" />
       <material name="black"/>
     </visual>
+    <!-- <inertial>
+      <mass value="0" />
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
+    </inertial> -->
   </link>
 
   <joint name="base_to_support" type="fixed">

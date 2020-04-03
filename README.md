@@ -3,15 +3,20 @@
 ## Instalation
 
 Required packages:  
-`ros-melodic-husky-gazebo ros-melodic-velodyne-* ros-melodic-apriltag-ros python3-empy`
+`ros-melodic-husky-gazebo ros-melodic-velodyne-* ros-melodic-apriltag-ros python3-empy catkin build`
 
 
 Workspace creation with `python3` support:
 
 First, install some build dependencies:
 ```bash
-sudo apt-get install python-catkin-tools python3-dev python3-numpy
+sudo apt-get install python-catkin-tools python3-dev python3-pip
 ```
+
+```bash
+pip3 install catkin_pkg numpy rospkg opencv-python
+```
+
 Now configure the workspace with `python3`:
 ```bash
 mkdir ~/catkin_ws

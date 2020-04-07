@@ -9,7 +9,7 @@
     <include file="$(find safer_stack)/launch/spawn_husky.launch">
         <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg urdf).urdf.xacro" />
     </include>
-
+    
     <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc">
         <param name="stereo_algorithm" value="0"/>
         <param name="prefilter_size" value="9"/>
@@ -21,16 +21,24 @@
 
     <!-- <node name="voxel_filter" pkg="safer_stack" type="test_pcl"/> -->
     <include file="$(find safer_stack)/launch/pcl_filters.launch" />
-    
-    <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
 
-    <node name="convert_pc" pkg="safer_stack" type="tf_pointclouds.py">
-        <remap from="input_lidar" to="/velodyne_points"/>
-        <remap from="output_lidar" to="/velodyne/point_cloud_transformed"/>
-        <remap from="input_camera" to="/statistical_outlier/output"/>
-        <remap from="output_camera" to="/bumblebee2/point_cloud_transformed"/>
-        <!-- <param name="only_lidar" type="bool" value="true" /> -->
+    <node name="convert_pc_lidar" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <remap from="input" to="/velodyne_points"/>
+        <remap from="output" to="/velodyne/point_cloud_transformed"/>
     </node>
+
+    <node name="convert_pc_camera" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <!-- <remap from="input" to="/statistical_outlier/output"/> -->
+        <remap from="input" to="/bumblebee2/points2"/>
+        <remap from="output" to="/bumblebee2/point_cloud_transformed"/>
+    </node>
+
+
+    <!-- <node name="ground_detection" pkg="safer_stack" type="ground_detector">
+        <remap from="input" to="/bumblebee2/point_cloud_transformed"/>
+        <remap from="output" to='/bumblebee2/ground'/>
+    </node> -->
+    <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
 
     <node pkg="safer_stack" name="interface" type="interface.py" output="screen"/>
     

@@ -1,0 +1,37 @@
+<launch>
+    
+    <node ns="bumblebee2" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc">
+        <param name="stereo_algorithm" value="0"/>
+        <param name="prefilter_size" value="9"/>
+        <param name="disparity_range" value="64"/>
+        <param name="correlation_window_size" value="15"/>
+        <param name="min_disparity" value="0" />
+        <param name="speckle_size" value="100" />
+    </node>
+
+    <group ns="bumblebee2">
+        <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+        <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+        <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+            <remap from="~input" to="/bumblebee2/points2" />
+            <!-- <remap from="~output" to="/bumblebee2/voxel_grid" /> -->
+            <rosparam>
+                filter_field_name: y
+                filter_limit_min: -10.0
+                filter_limit_max: 10.0
+                filter_limit_negative: False
+                leaf_size: 0.1
+            </rosparam>
+        </node>
+
+        <node pkg="nodelet" type="nodelet" name="statistical_outlier" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
+            <remap from="~input" to="/bumblebee2/voxel_grid/output"/>
+            <!-- <remap from="~output" to="/bumblebee2/statistical_outlier" /> -->
+            <rosparam>
+                mean_k: 10
+                stddev: 0.5
+            </rosparam>
+        </node>
+    </group>
+</launch>

@@ -216,7 +216,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /bumblebee2/point_cloud_transformed
+      Topic: /bumblebee2/statistical_outlier/output
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true

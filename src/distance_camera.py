@@ -79,30 +79,30 @@ class DistanceCamera(BaseAlgorithm):
         d = bins[idxs[0]] + bin_width / 2
         return d 
 
+    def algorithm3(self, cloud, th):
 
-    def algorithm2(self, cloud, th):
-        # works on bare cloud
-        # th = 1
+        height_threshold = 0.1
         x_nnan, y_nnan = np.nonzero(~np.isnan(cloud[:, :, 0]))
         points = cloud[x_nnan, y_nnan, :]
-
-        angles = np.arctan2(points[:, 0], points[:, 2])
+        angles = np.arctan2(points[:, 1], points[:, 0])
         ang_mask = np.logical_and(angles < np.pi / 6, angles > -np.pi/6)
         fpoints = points[ang_mask, :]
-        args = np.argsort(fpoints[:, 2])
-        sorted_x = fpoints[args, 2]
-        diff = sorted_x[1:] - sorted_x[:-1]
-        mask = diff > th
-        idxs = np.nonzero(mask)[0]
-        # print(idxs)
-        # 124752
-        # print(sorted_x[idxs[0] - 10:idxs[0]+10])
+        # print(fpoints[:, -1])
+        # height_mask = np.logical_and(fpoints[:, -1] < height_threshold, fpoints[:, -1] > -height_threshold)
+        # fpoints = fpoints[height_mask, :]
 
+        args = np.argsort(fpoints[:, 0])
+        sorted_x = fpoints[args, 0]
+        sorted_z = fpoints[args, -1]
+        diffx = sorted_x[1:] - sorted_x[:-1]
+        diffz = np.abs(sorted_z[1:] - sorted_z[:-1])
+        mask = np.logical_and(diffx > th, diffz > height_threshold)
+        idxs = np.nonzero(mask)[0]
         if len(idxs) > 0:
             d = sorted_x[idxs[0]]
         else:
             d = sorted_x[-1]
-
+        
         return d
 
     def detect_crest(self):
@@ -118,12 +118,7 @@ class DistanceCamera(BaseAlgorithm):
 
 
 def listener():
-
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # name are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
+    
     rospy.init_node('distance_camera', anonymous=True)
 
     distcamera = DistanceCamera(camera_cloud_topic='/bumblebee2/point_cloud_transformed')

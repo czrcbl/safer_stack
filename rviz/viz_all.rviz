@@ -201,7 +201,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: RGB8
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -216,7 +216,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /statistical_outlier/output
+      Topic: /bumblebee2/point_cloud_transformed
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -292,18 +292,18 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -1.2382986545562744
-        Y: 0.30869197845458984
-        Z: 5.234569072723389
+        X: -1.2184710502624512
+        Y: -0.03575704246759415
+        Z: 5.407680034637451
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.25039857625961304
+      Pitch: 0.2903985381126404
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.070403575897217
+      Yaw: 3.080399751663208
     Saved: ~
 Window Geometry:
   CameraLeft:

@@ -19,8 +19,9 @@ class DistanceCamera(BaseAlgorithm):
     def algorithm0(self, cloud, th):
         # works on transformed cloud
         th = 1
-        x_nnan, y_nnan = np.nonzero(~np.isnan(cloud[:, :, 0]))
-        points = cloud[x_nnan, y_nnan, :]
+        # x_nnan, y_nnan = np.nonzero(~np.isnan(cloud[:, :, 0]))
+        # points = cloud[x_nnan, y_nnan, :]
+        points = cloud.squeeze()
 
         angles = np.arctan2(points[:, 1], points[:, 0])
         ang_mask = np.logical_and(angles < np.pi / 12, angles > -np.pi/12)
@@ -81,9 +82,11 @@ class DistanceCamera(BaseAlgorithm):
 
     def algorithm3(self, cloud, th):
 
-        height_threshold = 0.1
-        x_nnan, y_nnan = np.nonzero(~np.isnan(cloud[:, :, 0]))
-        points = cloud[x_nnan, y_nnan, :]
+        height_threshold = 0.5
+        th = 1
+        # x_nnan, y_nnan = np.nonzero(~np.isnan(cloud[:, :, 0]))
+        # points = cloud[x_nnan, y_nnan, :]
+        points = cloud.squeeze()
         angles = np.arctan2(points[:, 1], points[:, 0])
         ang_mask = np.logical_and(angles < np.pi / 6, angles > -np.pi/6)
         fpoints = points[ang_mask, :]
@@ -94,9 +97,13 @@ class DistanceCamera(BaseAlgorithm):
         args = np.argsort(fpoints[:, 0])
         sorted_x = fpoints[args, 0]
         sorted_z = fpoints[args, -1]
+        sorted_points = fpoints[args, :]
+        print(sorted_points[-1, :])
         diffx = sorted_x[1:] - sorted_x[:-1]
         diffz = np.abs(sorted_z[1:] - sorted_z[:-1])
-        mask = np.logical_and(diffx > th, diffz > height_threshold)
+        # mask = np.logical_and(diffx > th, diffz > height_threshold)
+        mask = np.abs(sorted_z) > 1
+        # mask = np.logical_or(diffz > height_threshold,  np.abs(sorted_z[:-1]) > 1)
         idxs = np.nonzero(mask)[0]
         if len(idxs) > 0:
             d = sorted_x[idxs[0]]
@@ -111,7 +118,7 @@ class DistanceCamera(BaseAlgorithm):
         cloud = self.camera_cloud
         th = rospy.get_param('xdiff_threshold')
 
-        d = self.algorithm0(cloud, th)
+        d = self.algorithm3(cloud, th)
 
         print(d)
         self.d = d
@@ -121,7 +128,8 @@ def listener():
     
     rospy.init_node('distance_camera', anonymous=True)
 
-    distcamera = DistanceCamera(camera_cloud_topic='/bumblebee2/point_cloud_transformed')
+    # distcamera = DistanceCamera(camera_cloud_topic='/bumblebee2/point_cloud_transformed')
+    distcamera = DistanceCamera(camera_cloud_topic='/rtabmap/cloud_ground_transformed')
     distcamera.run()
     
 

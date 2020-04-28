@@ -41,7 +41,7 @@ class TransformPointCloud
           target_frame,
           source_frame,
           msg->header.stamp,
-          ros::Duration(200));
+          ros::Duration(10));
       sensor_msgs::PointCloud2 cloud_out;
       tf2::doTransform(*msg, cloud_out, transform);
       ROS_DEBUG_STREAM("output:");

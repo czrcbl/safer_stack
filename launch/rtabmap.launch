@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <include file="$(find rtabmap_ros)/launch/stereo_mapping.launch">
+        <arg name="rtabmapviz" value="false" /> 
+        <arg name="rtabmap_args" value="-d --Grid/RangeMax 0 --Grid/CellSize 0.5 --Grid/ClusterRadius 2 --Grid/FromDepth true" />
+        <arg name="rviz" value="false" />
+        <arg name="stereo_namespace" value="/stereo_camera" />
+        <arg name="approx_sync" value="true" />
+    </include>
+</launch>

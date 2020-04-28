@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="convert_ground" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <remap from="input" to="/rtabmap/cloud_ground"/>
+        <remap from="output" to="/rtabmap/cloud_ground_transformed"/>
+    </node>
+</launch>

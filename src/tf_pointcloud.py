@@ -40,7 +40,7 @@ class PointCloudTransformer:
 
 if __name__ == '__main__':
     rospy.init_node('transform_point_cloud', anonymous=True)
-    target_frame = rospy.get_param('only_lidar', 'base_link')
+    target_frame = rospy.get_param('target_frame', 'base_link')
     trans = PointCloudTransformer(
             input_topic='input', 
             output_topic='output',

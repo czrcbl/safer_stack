@@ -1,0 +1,11 @@
+<launch>
+  <node type="point_cloud2_assembler" pkg="laser_assembler" name="hdl_floor_assembler">
+    <remap from="cloud" to="/floor_detection/floor_filtered_points"/>
+    <param name="max_clouds" type="int" value="400" />
+    <param name="fixed_frame" type="string" value="base_link" />
+  </node>
+
+  <node type="pc_assembler.py" pkg="safer_stack" name="assembler_publisher">
+    <remap from="output" to="/ground_assembled" />
+  </node>
+</launch>

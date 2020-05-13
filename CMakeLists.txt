@@ -207,18 +207,10 @@ include_directories(
 
 ## Added by me
 
-add_executable(test_pcl src/test_pcl.cpp)
+add_executable(test_pcl src/utils/test_pcl.cpp)
 target_link_libraries(test_pcl ${catkin_LIBRARIES})
 add_dependencies(test_pcl safer_stack_generate_messages_cpp)
 
-add_executable(ground_detector src/ground_detector.cpp)
-target_link_libraries(ground_detector ${catkin_LIBRARIES})
-add_dependencies(ground_detector safer_stack_generate_messages_cpp)
-
-add_executable(down_sample_pc src/down_sample_pc.cpp)
-target_link_libraries(down_sample_pc ${catkin_LIBRARIES})
-add_dependencies(down_sample_pc safer_stack_generate_messages_cpp)
-
-add_executable(tf_pointcloud src/tf_pointcloud.cpp)
+add_executable(tf_pointcloud src/utils//tf_pointcloud.cpp)
 target_link_libraries(tf_pointcloud ${catkin_LIBRARIES})
 add_dependencies(tf_pointcloud safer_stack_generate_messages_cpp)

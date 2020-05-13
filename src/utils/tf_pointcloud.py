@@ -16,7 +16,7 @@ class PointCloudTransformer:
         self.target_frame = target_frame
         self.pub = rospy.Publisher(output_topic, PointCloud2, queue_size=2)
         self.sub = rospy.Subscriber(input_topic, PointCloud2, self.callback, queue_size=2)
-        self.tf_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(12))
+        self.tf_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(1.0))
         self.tl = tf2_ros.TransformListener(self.tf_buffer)
 
     def callback(self, msg):
@@ -25,7 +25,7 @@ class PointCloudTransformer:
         source_frame = msg.header.frame_id
         try:
             trans = self.tf_buffer.lookup_transform(target_frame, source_frame, lookup_time,
-                                                    rospy.Duration(1))
+                                                    rospy.Duration(0.0))
         except tf2.LookupException as ex:
             rospy.logwarn(str(lookup_time.to_sec()))
             rospy.logwarn(ex)

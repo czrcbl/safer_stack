@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="convert_pc_lidar" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <remap from="input" to="/lidar/points2"/>
+        <remap from="output" to="/lidar/points2_transformed"/>
+    </node>
+</launch>

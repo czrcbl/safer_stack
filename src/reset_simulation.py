@@ -9,6 +9,8 @@ import random
 import sys
 import math
 
+from std_srvs.srv import Empty
+
 
 def create_message(coords, yaw):
 
@@ -51,6 +53,12 @@ def change_pose(coords, yaw):
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
+def reset_map():
+
+    rospy.wait_for_service('rtabmap/reset')
+    reset = rospy.ServiceProxy('rtabmap/reset', Empty)
+    resp = reset()
+    print(resp)
 
 if __name__ == "__main__":
     argv = rospy.myargv(argv=sys.argv)
@@ -59,7 +67,7 @@ if __name__ == "__main__":
     else:
         r = False
     am = math.pi / 180
-    default_yaw = am * 90 
+    default_yaw = 90 # 90 radians
     default_coords = (14.501486, -42.408237, 17.819097)
     if not r:
         change_pose(default_coords, default_yaw)
@@ -67,3 +75,5 @@ if __name__ == "__main__":
         coords = (random.uniform(2.0, 16.0), default_coords[1], default_coords[2])
         yaw = random.uniform(default_yaw - am * 25, default_yaw + am * 25)
         change_pose(coords, yaw)
+
+    # reset_map()

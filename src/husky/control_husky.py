@@ -4,13 +4,14 @@ from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
 import numpy as np
 from utils import create_message
+import sys
 
 
 class HuskyControl:
 
-    def __init__(self):
+    def __init__(self, edge_distance_topic='/edge_distance'):
         self.pub = rospy.Publisher('/husky_velocity_controller/cmd_vel', Twist, queue_size=10)
-        rospy.Subscriber('/edge_distance', Float32, self.callback)
+        rospy.Subscriber(edge_distance_topic, Float32, self.callback)
         self.twist = None
     
     def callback(self, data):
@@ -31,11 +32,12 @@ class HuskyControl:
             self.pub.publish(self.twist)
 
 def main():
+    argv = rospy.myargv(argv=sys.argv)
+    dev = argv[1]
 
-    
     rospy.init_node('ControlHusky', anonymous=True)
     
-    huskyctl = HuskyControl()
+    huskyctl = HuskyControl(edge_distance_topic='/{}/edge_distance'.format(dev))
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         # rospy.loginfo('Message sent!')

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+import __fix
 import rospy
 from std_msgs.msg import Float32
 from sensor_msgs.msg import PointCloud2, Image
 import sensor_msgs.point_cloud2 as pc2
 import numpy as np
 import message_filters
-from utils import BaseAlgorithm
+
+from lib.utils import BaseAlgorithm
 
 class DistanceLidar(BaseAlgorithm):
 
@@ -51,7 +53,10 @@ def listener():
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
     rospy.init_node('distance_lidar', anonymous=True)
-    distlidar = DistanceLidar()
+    distlidar = DistanceLidar(
+        edge_topic='/lidar/edge_distance',
+        crest_topic='lidar/crest'
+    )
     distlidar.run()
     
  

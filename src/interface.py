@@ -13,10 +13,13 @@ from utils import create_message
 
 class Interface:
 
-    def __init__(self):
-        rospy.Subscriber('/edge_distance', Float32, self.distance_callback)
+    def __init__(self, edge_distance_topic='/edge_distance'):
+        self.edge_distance_topic = edge_distance_topic
+
+        rospy.Subscriber(edge_distance_topic, Float32, self.distance_callback)
         rospy.Subscriber('/crest', numpy_msg(Float32), self.crest_callback)
-        rospy.Subscriber('/bumblebee2/left/image_rect_color', Image, self.image_callback)
+        rospy.Subscriber('/stereo_camera/left/image_rect_color', Image, self.image_callback)
+        
         self.bridge = CvBridge()
         self.image = None
         self.d = None
@@ -46,7 +49,7 @@ class Interface:
             return
         # np_image = np.asarray(cv_image)
         image = self.draw_image()
-        cv2.imshow('Rear Camera', cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        cv2.imshow('Rear Camera - {}'.format(self.edge_distance_topic), cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         cv2.waitKey(3)
 
 

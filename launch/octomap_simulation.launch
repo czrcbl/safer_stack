@@ -19,7 +19,9 @@
 
     <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
 
-    <node pkg="safer_stack" name="interface_lidar" type="interface.py" output="screen">
+    
+
+    <!-- <node pkg="safer_stack" name="interface_lidar" type="interface.py" output="screen">
         <remap from="/edge_distance" to="/lidar/edge_distance"/>
         <remap from="/crest" to="/lidar/crest"/>
     </node>
@@ -27,7 +29,7 @@
     <node pkg="safer_stack" name="interface_rtabmap" type="interface.py" output="screen">
         <remap from="/edge_distance" to="/rtabmap/edge_distance"/>
         <remap from="/crest" to="/rtabmap/crest"/>
-    </node>
+    </node> -->
 
 
     <!-- <include file="$(find safer_stack)/launch/rtabmap.launch" /> -->

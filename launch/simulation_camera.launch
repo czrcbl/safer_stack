@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    
+    <arg name="urdf" default="vlp16_bumblebee" />
+
+    <include file="$(find safer_stack)/launch/spawn/sand_mine.launch"></include>
+
+    <include file="$(find safer_stack)/launch/spawn/spawn_husky.launch">
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg urdf).urdf.xacro" />
+    </include>
+    
+    <include file="$(find safer_stack)/launch/utils/process_camera.launch" />
+
+    <!-- <node name="convert_pc_lidar" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <remap from="input" to="/velodyne_points"/>
+        <remap from="output" to="/velodyne/point_cloud_transformed"/>
+    </node>
+
+    <node name="convert_pc_camera_filt" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <remap from="input" to="/stereo_camera/statistical_outlier/output"/>
+        <remap from="output" to="/stereo_camera/points2_filtered_transformed"/>
+    </node> -->
+
+    <!-- <node name="convert_pc_camera" pkg="safer_stack" type="tf_pointcloud" output="screen">
+        <remap from="input" to="/bumblebee2/points2"/>
+        <remap from="output" to="/bumblebee2/points2_transformed"/>
+    </node> -->
+
+    <!-- <node name="ground_detection" pkg="safer_stack" type="ground_detector">
+        <remap from="input" to="/bumblebee2/point_cloud_transformed"/>
+        <remap from="output" to='/bumblebee2/ground'/>
+    </node> -->
+
+    <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
+
+    <!-- <node pkg="safer_stack" name="interface" type="interface.py" output="screen"/> -->
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/camera.rviz" output="screen"/>
+
+</launch>

@@ -76,4 +76,4 @@ if __name__ == "__main__":
         yaw = random.uniform(default_yaw - am * 25, default_yaw + am * 25)
         change_pose(coords, yaw)
 
-    # reset_map()
+    reset_map()

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-# license removed for brevity
+import __fix
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist, Vector3 
 
-from utils import create_message
+from lib.utils import create_message
 
 def talker():
 

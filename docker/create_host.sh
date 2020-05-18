@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 docker run -it \
-    -p 12345:12345 \
-    --mount type=bind,source=/home/$USER/catkin_docker,target=/home/ros/catkin_ws \
+    -p 8888:8888  \
+    --mount type=bind,source=/home/$USER/ros_docker,target=/home/ros \
     --gpus all \
     --env="DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \

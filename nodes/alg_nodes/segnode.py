@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from detectron2 import model_zoo
-import __fix
+import _fix
 import rospy
 from std_msgs.msg import Float32
 from sensor_msgs.msg import PointCloud2, Image
@@ -11,7 +11,9 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import os
 import cv2
-from lib3.nn import Segmenter 
+from safer_stack3.nn import Segmenter
+from safer_stack.utils import pointcloud2_2_npxyz
+
 
 class ObstacleNN:
 
@@ -32,7 +34,7 @@ class ObstacleNN:
         
         rospy.Subscriber('/stereo_camera/left/image_rect_color', Image, self.color_img_callback)
         rospy.Subscriber('/stereo_camera/left/image_rect', Image, self.rect_img_callback)
-        # rospy.Subscriber('/bumblebee2/points2', PointCloud2, self.points2_callback)
+        rospy.Subscriber('/stereo_camera/points2', PointCloud2, self.points2_callback)
 
         
     def color_img_callback(self, data):
@@ -40,6 +42,10 @@ class ObstacleNN:
 
     def rect_img_callback(self, data):
         self.rect_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
+
+    def lidar_points2_callback(self, data):
+
+        self.lidar_cloud = pointcloud2_2_npxyz(data)
 
     def publish(self):
         

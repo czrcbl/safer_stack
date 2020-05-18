@@ -26,13 +26,19 @@ class Segmenter:
         self.predictor = DefaultPredictor(cfg)
 
     def __call__(self, im):
-        panoptic_seg, segments_info = self.predictor(im)["panoptic_seg"]
-        return panoptic_seg, segments_info
+        pred = self.predictor(im)
+        return pred
+
+    def panoptic(self, im):
+        return self(im)['panoptic_seg']
+    
+    def semantic(self, im):
+        return self(im)['instances']
 
     def pred_and_draw(self, im, im_format='cv2'):
-        panoptic_seg, segments_info = self(im)
+        panoptic_seg, segments_info = self(im)['panoptic_seg']
         v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]), scale=1.2)
-        v = v.draw_panoptic_seg_predictions(panoptic_seg.to("cpu"), segments_info)
+        v = v.draw_panoptic_seg_predictions(panoptic_seg.to('cpu'), segments_info)
         im = v.get_image()
         if im_format == 'cv2':
             return im

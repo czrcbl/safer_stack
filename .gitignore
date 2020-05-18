@@ -1,4 +1,5 @@
 .vscode/
+models/sand_mine
 data/
 # Created by https://www.gitignore.io/api/ros
 # Edit at https://www.gitignore.io/?templates=ros

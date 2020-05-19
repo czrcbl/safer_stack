@@ -70,6 +70,7 @@ RUN apt-get -y install python3-pip
 
 # Install project dependencies
 RUN apt-get -y install ros-melodic-pointgrey-camera-driver \
+    ros-melodic-pointgrey-camera-description \
     ros-melodic-husky-gazebo \
     ros-melodic-velodyne-* \
     ros-melodic-apriltag-ros \ 

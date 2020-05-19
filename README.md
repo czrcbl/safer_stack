@@ -36,7 +36,7 @@ git clone -b melodic https://github.com/ros-perception
 Bumblebee2 support:
 
 ```bash
-sudo apt-get install ros-melodic-pointgrey-camera-driver
+sudo apt-get install ros-melodic-pointgrey-camera-driver ros-melodic-pointgrey-camera-description
 ```
 
 Then:

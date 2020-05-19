@@ -1,5 +1,9 @@
 # SAFER STACK
 
+# Docker Setup
+The `docker` folder contain a Docker file for `melodic` and `noetic` distribution.
+Docker deployment is the preferred way.
+
 ## Instalation
 
 Required packages:  

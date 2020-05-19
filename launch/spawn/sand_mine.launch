@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <arg name="gui" default="false" />
-    <!-- <arg name="world_name" default="$(find safer_stack)/worlds/sand_mine.world"/> -->
+    <arg name="gui" default="true" />
+    <arg name="world_name" default="$(find safer_stack)/worlds/sand_mine.world"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <!-- <arg name="world_name" value="$(arg world_name)"/> -->
         <arg name="gui" value="$(arg gui)" />
-        <arg name="verbose" value="true" />
+        <arg name="world_name" value="$(arg world_name)"/>
     </include>
-
-    <include file="$(find safer_stack)/launch/spawn/spawn_sand_mine.launch"></include>
 </launch>

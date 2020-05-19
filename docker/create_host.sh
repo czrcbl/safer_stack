@@ -1,8 +1,12 @@
 #!/usr/bin/bash
+# Crete a container with the recomended options.
+# Note that the /home/ros folder of the container will
+# be mounted on /home/Docker/safer_stack on host
 docker run -it \
     -p 8888:8888  \
     -p 11345:11345 \
     -p 8090:8080 \
+    -p 5900:5900 \
     --mount type=bind,source=/home/$USER/Docker/safer_stack,target=/home/ros \
     --gpus all \
     --env="DISPLAY" \

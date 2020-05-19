@@ -20,11 +20,11 @@
       </include>
     </model>
 
-    <gui>
+    <!-- <gui>
       <camera name="user_camera">
         <pose>13 -41 20 0 0 -30</pose>
       </camera>
-    </gui>   
+    </gui>    -->
      
   </world>
 </sdf>

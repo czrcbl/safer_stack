@@ -61,8 +61,8 @@ RUN apt-get update
 RUN apt install -y ros-melodic-desktop-full
 
 # Install dev dependencies
-RUN apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
-RUN apt install -y python-catkin-tools
+RUN apt-get install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+RUN apt-get install -y python-catkin-tools
 RUN rosdep init
 
 # Install python3 pip
@@ -75,6 +75,9 @@ RUN apt-get -y install ros-melodic-pointgrey-camera-driver \
     ros-melodic-velodyne-* \
     ros-melodic-apriltag-ros \ 
     python3-empy
+
+# Install gzweb dependencies
+RUN apt-get install -y libjansson-dev libboost-dev imagemagick libtinyxml-dev cmake build-essential
 
 COPY post_install.sh /post_install.sh
 

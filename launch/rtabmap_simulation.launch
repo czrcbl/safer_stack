@@ -4,13 +4,13 @@
     <arg name="urdf" default="vlp16_bumblebee_vertical" />
     <arg name="tag" default="false"/>
 
-    <include file="$(find safer_stack)/launch/sand_mine.launch"></include>
+    <include file="$(find safer_stack)/launch/spawn/sand_mine.launch"></include>
 
-    <include file="$(find safer_stack)/launch/spawn_husky.launch">
+    <include file="$(find safer_stack)/launch/spawn/spawn_husky.launch">
         <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg urdf).urdf.xacro" />
     </include>
     
-    <include file="$(find safer_stack)/launch/process_camera.launch" />
+    <include file="$(find safer_stack)/launch/utils/process_camera.launch" />
 
     <node name="convert_pc_lidar" pkg="safer_stack" type="tf_pointcloud" output="screen">
         <remap from="input" to="/lidar/points2"/>

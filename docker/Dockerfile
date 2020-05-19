@@ -21,12 +21,6 @@ RUN apt-get install -y mesa-utils
 RUN apt-get update && \
       apt-get -y install sudo
 
-
-# # Locale
-# ENV LANG=$DOCKER_LANG.UTF-8 \
-#     LANGUAGE=$DOCKER_LANG:UTF-8 \
-#     LC_ALL=$DOCKER_LANG.UTF-8
-
 # Add user
 ENV USER=ros
 ENV PASSWD=ros
@@ -71,15 +65,29 @@ RUN apt install -y python-rosdep python-rosinstall python-rosinstall-generator p
 RUN apt install -y python-catkin-tools
 RUN rosdep init
 
-# Setup environment
+# Install python3 pip
+RUN apt-get -y install python3-pip
+
+# Install project dependencies
+RUN apt-get -y install ros-melodic-pointgrey-camera-driver \
+    ros-melodic-husky-gazebo \
+    ros-melodic-velodyne-* \
+    ros-melodic-apriltag-ros \ 
+    python3-empy
+
+COPY post_install.sh /post_install.sh
+
 USER $USER
-RUN rosdep fix-permissions && rosdep update
-RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-RUN /bin/bash -c "source ~/.bashrc"
+WORKDIR /home/$USER
+# Setup environment
+# USER $USER
+# RUN rosdep fix-permissions && rosdep update
+# RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+# RUN /bin/bash -c "source ~/.bashrc"
 
 # Create catkin workspace
-RUN mkdir -p /home/ros/catkin_ws/src
+# RUN mkdir -p /home/ros/catkin_ws/src
 # RUN cd ~/catkin_ws/
-WORKDIR  /home/ros/catkin_ws
-RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+# WORKDIR  /home/ros/catkin_ws
+# RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 # RUN /bin/bash -c "source ~/.bashrc"

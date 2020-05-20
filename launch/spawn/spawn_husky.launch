@@ -1,4 +1,5 @@
-  <launch>
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
     <arg name="urdf_extras" default="$(find safer_stack)/urdf/vlp16_bumblebee.urdf.xacro"></arg>
     <arg name="robot_namespace" default="/"/>
     <arg name="x" default="14.501486"/>

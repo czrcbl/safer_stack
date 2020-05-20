@@ -1,9 +1,11 @@
 from __future__ import print_function, division
 import rospy
-from geometry_msgs.msg import Twist, Vector3
+from geometry_msgs.msg import Twist, Vector3, Pose, Point, Quaternion
+from gazebo_msgs.msg import ModelState
 from std_msgs.msg import Float32
 from sensor_msgs.msg import Image, PointCloud2
 import sensor_msgs.point_cloud2 as pc2
+from tf.transformations import quaternion_from_euler
 from rospy.numpy_msg import numpy_msg
 import numpy as np
 import os
@@ -12,8 +14,10 @@ from cv_bridge import CvBridge, CvBridgeError
 project_path = os.path.abspath(os.path.realpath(os.path.dirname(os.path.dirname(__file__))))
 
 
-def create_message(linear, angular=[0,0,0]):
-    
+def create_twist_message(linear, angular=[0,0,0]):
+    """
+    Create a twist message for the husky
+    """
     linearm = Vector3()
     linearm.x = linear[0]
     linearm.y = linear[1]
@@ -28,6 +32,39 @@ def create_message(linear, angular=[0,0,0]):
     twist.angular = angularm
 
     return twist
+
+
+def create_modelstate_message(coords, yaw, model_name='/'):
+    """
+    Create a model state message for husky robot
+    """
+    pose = Pose()
+    p = Point()
+    p.x = coords[0]
+    p.y = coords[1]
+    p.z = coords[2]
+    pose.position = p
+    
+    qua = quaternion_from_euler(0, 0, yaw)
+    q = Quaternion()
+    q.x = qua[0]
+    q.y = qua[1]
+    q.z = qua[2]
+    q.w = qua[3]
+    pose.orientation = q
+    
+    twist = Twist()
+    twist.linear = Vector3(0, 0, 0)
+    twist.angular = Vector3(0, 0, 0)
+
+    ms = ModelState()
+
+    ms.model_name = model_name
+    ms.pose = pose
+    ms.twist = twist
+    ms.reference_frame = 'sand_mine'
+
+    return ms
 
 
 def pointcloud2_2_npxyz(data):

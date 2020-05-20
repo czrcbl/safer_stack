@@ -66,7 +66,10 @@ RUN apt-get install -y python-catkin-tools
 RUN rosdep init
 
 # Install python pip
-RUN apt-get -y install python-pip python3-pip
+RUN apt-get -y install python-pip \
+    python3-pip \
+    python3-dev \
+    python3-catkin-pkg-modules
 
 # Install project dependencies
 RUN apt-get -y install ros-melodic-pointgrey-camera-driver \

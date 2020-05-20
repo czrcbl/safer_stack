@@ -43,9 +43,9 @@ class ObstacleNN:
     def rect_img_callback(self, data):
         self.rect_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
 
-    def lidar_points2_callback(self, data):
+    def points2_callback(self, data):
 
-        self.lidar_cloud = pointcloud2_2_npxyz(data)
+        self.camera_cloud = pointcloud2_2_npxyz(data)
 
     def publish(self):
         

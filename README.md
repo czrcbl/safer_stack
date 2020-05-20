@@ -4,7 +4,34 @@
 The `docker` folder contain a Docker file for `melodic` and `noetic` distribution.
 Docker deployment is the preferred way.
 
-## Instalation
+Install [Docker](https://docs.docker.com/engine/install/).
+
+Create the folder on host to mount the home folder on the container.  
+Default (edit `docker/create_container.sh` to change default):
+```bash
+mkdir -p ~/Docker/safer_stack/catkin_ws/src
+```
+Clone this repository inside the src folder.
+
+Build the image
+``` bash
+cd /docker/{ros-distro}
+docker build --tag safer_stack .
+```
+In order to run the container:
+```bash
+sh docker/create_container.sh
+```
+Note that in order to display the graphical interfaces on host, a method that may be unsafe is used by this script.
+
+Run `sh /post_install.sh` to create the catkin workspace and add the setup files to .bashrc on the `ros` user.
+
+Then run `install.sh` to install the python dependencies locally.
+
+
+
+
+## Installation
 
 Required packages:  
 `ros-melodic-husky-gazebo ros-melodic-velodyne-* ros-melodic-apriltag-ros python3-empy catkin build`

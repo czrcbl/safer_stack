@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import _fix
 import sys
 import rospy
 from tf.transformations import quaternion_from_euler
@@ -9,45 +10,16 @@ import random
 import sys
 import math
 
+from safer_stack.utils import create_modelstate_message
 from std_srvs.srv import Empty
 
-
-def create_message(coords, yaw):
-
-    pose = Pose()
-    p = Point()
-    p.x = coords[0]
-    p.y = coords[1]
-    p.z = coords[2]
-    pose.position = p
-    
-    qua = quaternion_from_euler(0, 0, yaw)
-    q = Quaternion()
-    q.x = qua[0]
-    q.y = qua[1]
-    q.z = qua[2]
-    q.w = qua[3]
-    pose.orientation = q
-    
-    twist = Twist()
-    twist.linear = Vector3(0, 0, 0)
-    twist.angular = Vector3(0, 0, 0)
-
-    ms = ModelState()
-
-    ms.model_name = '/'
-    ms.pose = pose
-    ms.twist = twist
-    ms.reference_frame = 'sand_mine'
-
-    return ms
 
 def change_pose(coords, yaw):
     rospy.wait_for_service('/gazebo/set_model_state')
 
     try:
         set_model_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-        msg = create_message(coords, yaw)
+        msg = create_modelstate_message(coords, yaw)
         resp = set_model_state(msg)
         print(resp)
     except rospy.ServiceException, e:

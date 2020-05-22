@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-import _fix
+#!/usr/bin/env python
 import rospy
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
 import numpy as np
-from safer_stack.utils import create_message
+from safer_stack.utils import create_twist_message
 import sys
 
 
@@ -20,11 +19,11 @@ class HuskyControl:
         th = rospy.get_param('stop_distance', 7)
         vel = max([min([d - th, 1]), 0.2])
         if np.isnan(d):
-            twist = create_message([1, 0, 0])
+            twist = create_twist_message([1, 0, 0])
         elif d < th:
-            twist = create_message([0, 0, 0])
+            twist = create_twist_message([0, 0, 0])
         else:
-            twist = create_message([vel, 0, 0])
+            twist = create_twist_message([vel, 0, 0])
 
         self.twist = twist
 

@@ -36,12 +36,13 @@ class Segmenter:
         return self(im)['instances']
 
     def pred_and_draw(self, im, im_format='cv2'):
-        panoptic_seg, segments_info = self(im)['panoptic_seg']
+        pred = self(im)
+        panoptic_seg, segments_info = pred['panoptic_seg']
         v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]), scale=1.2)
         v = v.draw_panoptic_seg_predictions(panoptic_seg.to('cpu'), segments_info)
         im = v.get_image()
         if im_format == 'cv2':
-            return im
+            return im, pred
         else:
-            return im[:, :, ::-1]
+            return im[:, :, ::-1], pred
 

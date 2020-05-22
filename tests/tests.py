@@ -15,21 +15,26 @@ if src_path not in sys.path:
 import unittest
 import matplotlib.pyplot as plt
 import cv2
-from safer_stack3 import nn
+from safer_stack import nn
 
 
 class TestSegmenter(unittest.TestCase):
 
     def setUp(self):
         self.predictor = nn.Segmenter()
-
-    def test_seg(self):
-        img = plt.imread(pjoin(test_path, 'sample_img.jpg'))
+        self.im = plt.imread(pjoin(test_path, 'sample_img.jpg'))
+    def test_call(self):
+        pass
         # seg, info = self.predictor.panoptic(img)
-        data = self.predictor(img)
-        print(data.keys())
-        print(data['sem_seg'].shape)
-        print(data['instances'])
+        # data = self.predictor(self.im)
+        # print(data)
+
+    def test_instance_seg(self):
+
+        print(self.im)
+        im, npim = self.predictor.preprocess(self.im)
+        seglist = self.predictor.instance_seg(im)
+        print(seglist)
 
     # def test_upper(self):
     #     self.assertEqual('foo'.upper(), 'FOO')

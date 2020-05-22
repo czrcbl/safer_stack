@@ -4,10 +4,13 @@
     <arg name="urdf" default="vlp16_bumblebee" />
     <arg name="tag" default="false"/>
 
-    <include file="$(find safer_stack)/launch/spawn/sand_mine.launch"></include>
+    <include file="$(find safer_stack)/launch/spawn/sand_mine.launch">
+    </include>
 
-    <include file="$(find safer_stack)/launch/spawn/spawn_husky.launch">
+    <!-- <include file="$(find safer_stack)/launch/spawn/spawn_husky.launch">
         <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg urdf).urdf.xacro" />
+    </include> -->
+    <include file="$(find safer_stack)/launch/devel/spawn_objects.launch">
     </include>
     
     <include file="$(find safer_stack)/launch/utils/process_camera.launch" />

@@ -4,7 +4,7 @@ import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist, Vector3 
 
-from safer_stack.utils import create_message
+from safer_stack.utils import create_twist_message
 
 def talker():
 
@@ -12,7 +12,7 @@ def talker():
     rospy.init_node('Move', anonymous=True)
     rate = rospy.Rate(10)
     
-    twist = create_message([1,0,0])
+    twist = create_twist_message([1,0,0])
     
     
     while not rospy.is_shutdown():

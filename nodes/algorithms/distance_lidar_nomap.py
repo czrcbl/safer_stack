@@ -1,18 +1,28 @@
-#!/usr/bin/env python3
-import __fix
+#!/usr/bin/env python
 import rospy
 from std_msgs.msg import Float32
-from sensor_msgs.msg import PointCloud2, Image
+from sensor_msgs.msg import PointCloud2
 import sensor_msgs.point_cloud2 as pc2
 import numpy as np
-import message_filters
+from rospy.numpy_msg import numpy_msg
 
-from lib.utils import BaseAlgorithm
+from safer_stack.utils import pointcloud2_2_npxyz
 
-class DistanceLidar(BaseAlgorithm):
+class DistanceLidar:
 
-    def __init__(self, *args, **kargs):
-        super().__init__(*args, **kargs)
+    def __init__(self, edge_topic='/lidar/edge_distance',
+        crest_topic='/lidar/crest',
+        lidar_cloud_topic='/lidar/points2_transformed'):
+    
+        self.pub_dist = rospy.Publisher(edge_topic, Float32, queue_size=10)
+        self.pub_crest = rospy.Publisher(crest_topic, numpy_msg(Float32), queue_size=10)
+        
+        rospy.Subscriber(lidar_cloud_topic, PointCloud2, self.lidar_points2_callback)
+
+    def lidar_points2_callback(self, data):
+
+        self.lidar_cloud = pointcloud2_2_npxyz(data)
+        self.publish()
     
     def detect_crest(self):
         
@@ -43,6 +53,13 @@ class DistanceLidar(BaseAlgorithm):
         print(d)
 
         self.d = d
+
+    def publish(self):
+        
+        self.detect_crest()
+        dmsg = Float32()
+        dmsg.data = self.d
+        self.pub_dist.publish(dmsg)
         
     
 def listener():
@@ -55,9 +72,10 @@ def listener():
     rospy.init_node('distance_lidar', anonymous=True)
     distlidar = DistanceLidar(
         edge_topic='/lidar/edge_distance',
-        crest_topic='lidar/crest'
+        crest_topic='/lidar/crest'
     )
-    distlidar.run()
+    while True:
+        rospy.spin()
     
  
 

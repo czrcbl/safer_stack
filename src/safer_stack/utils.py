@@ -81,7 +81,7 @@ def pointcloud2_2_npxyz(data):
     return coords
 
 
-class BaseAlgorithm:
+class BaseAlgorithm(object):
 
     def __init__(self, pub_rate=5, 
         edge_topic='/edge_distance',

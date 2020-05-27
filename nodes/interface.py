@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import rospy 
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
@@ -8,7 +8,7 @@ from apriltag_ros.msg import AprilTagDetectionArray
 import numpy as np
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-from utils import create_message
+# from safer_stack.utils import create_message
 
 
 class Interface:
@@ -18,7 +18,7 @@ class Interface:
 
         rospy.Subscriber(edge_distance_topic, Float32, self.distance_callback)
         rospy.Subscriber('/crest', numpy_msg(Float32), self.crest_callback)
-        rospy.Subscriber('/stereo_camera/left/image_rect_color', Image, self.image_callback)
+        rospy.Subscriber('/stereo_camera/left/image_raw', Image, self.image_callback)
         
         self.bridge = CvBridge()
         self.image = None

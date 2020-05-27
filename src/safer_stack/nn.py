@@ -65,9 +65,11 @@ class BasePredictor(object):
 
 
 class Segmenter(BasePredictor):
+   
     available_models = {
         'mask_rcnn_resnet18_v1b_coco': FasterRCNNDefaultTransform(short=600, max_size=1000)
     }   
+    
     def __init__(self, backend='mask_rcnn_resnet18_v1b_coco', ctx=mx.gpu()):
         if backend not in Segmenter.available_models.keys():
             raise ValueError('Backend {} no available, avaliabe backends: {}'.format(backend, Segmenter.available_models.keys()))
@@ -82,11 +84,13 @@ class Segmenter(BasePredictor):
 
 
 class Detector(BasePredictor):
+    
     available_models = {
         'ssd_512_mobilenet1.0_coco': SSDDefaultTransform(width=512, height=512),
         'ssd_512_resnet50_v1_coco': SSDDefaultTransform(width=512, height=512),
         'faster_rcnn_resnet50_v1b_coco': FasterRCNNDefaultTransform(short=600, max_size=1000)
     }
+
     def __init__(self, backend='ssd_512_mobilenet1.0_coco', ctx=mx.gpu()):
         if backend not in Detector.available_models.keys():
             raise ValueError('Backend {} no available, available backends: {}'.format(backend, Detector.available_models.keys()))

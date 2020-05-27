@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function, division
 import sys
 import rospy
 from std_msgs.msg import Float32
@@ -10,6 +11,8 @@ import cv2
 import os
 import cv2
 import time
+import mxnet as mx
+
 from safer_stack.utils import pointcloud2_2_npxyz
 from safer_stack.nn import Segmenter, Detector
 from safer_stack.tracking import Tracker
@@ -17,14 +20,14 @@ from safer_stack.tracking import Tracker
 
 class ObstacleNN:
 
-    def __init__(self, model_type='detection'):
+    def __init__(self, model_type='segmentation'):
         
         self.model_type = model_type
 
         if model_type == 'detection':
-            self.predictor = Detector()
+            self.predictor = Detector(ctx=mx.gpu())
         elif model_type == 'segmentation':
-            self.predictor = Segmenter()
+            self.predictor = Segmenter(ctx=mx.gpu())
 
         self.tracker = Tracker()
 
@@ -95,20 +98,22 @@ class ObstacleNN:
 
         im = self.color_img[:, :, ::-1]
         cloud = self.camera_cloud
-        
-        
+        th = 0.7
+        tic = time.time()
         if self.model_type == 'detection':
-            bboxlist, npim = self.predictor.detect(im)
-            dists = self.compute_distances(bboxlist, npim)
+            bboxlist, npim = self.predictor.detect(im, th=th)
+            
         elif self.model_type == 'segmentation':
-            seglist, bboxlist, npim = self.predictor.detect(im)
-            dists = self.compute_distances(bboxlist, npim)
+            seglist, bboxlist, npim = self.predictor.detect(im, th=th)
         
-        tbboxes = self.tracker.track(bboxlist)
-        dim = tbboxes.draw(npim)
-       
+        print('Model Execution Time:', time.time() - tic)
+        bboxlist = bboxlist.remove_overlap()
+        dists = self.compute_distances(bboxlist, npim)
         print(dists)
-
+        dim = bboxlist.draw(npim)
+        # tbboxes = self.tracker.track(bboxlist)
+        # dim = tbboxes.draw(npim)
+    
 
         fps = self.fps()
         print('FPS:', fps)

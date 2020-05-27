@@ -133,8 +133,15 @@ class Bbox(object):
     
     def draw(self, img, copy=True):
         """Draw bbox on image, expect an int image"""
-        if copy:
-            img = np.copy(img)
+
+        if img.dtype == np.float:
+            img = (img * 255).astype(np.uint8)
+        elif img.dtype == np.uint8:
+            if copy:
+                img = np.copy(img)
+        else:
+            raise ValueError('Image of type {} should be a float or uint8 array.'.format(img.dtype))   
+        
         height, width = img.shape[:2]
         if (self.parent is not None) and (self.parent.all_classes is not None):
             color = plt.get_cmap('hsv')(self.class_id / len(self.parent.all_classes))
@@ -196,15 +203,15 @@ class BboxList(list):
         bblist = _cls()
         bblist.th = th
         bblist.all_classes = class_names
-        out_bboxes = []
+        out_bboxes = BboxList()
         for _id, score, bbox, _cls in zip(ids, scores, bboxes, classes):
             _id = int(_id)
             if score > th: 
                 out_bboxes.append(Bbox(bbox,_id, score, _cls, parent=bblist))
         # Sort the boxes only once
-        out_bboxes = sorted(out_bboxes, key=(lambda x: x.score), reverse=True)
-        bblist.extend(out_bboxes)
-        return bblist
+        # out_bboxes = sorted(out_bboxes, key=(lambda x: x.score), reverse=True)
+        # bblist.extend(out_bboxes)
+        return out_bboxes.sort()
 
     @property
     def class_names(self):
@@ -214,11 +221,11 @@ class BboxList(list):
             id_cls_map[bb.class_id] = bb.class_name
         return [id_cls_map[e] for e in self.get_uids()]
 
-    def append(self, bb):
-        """Overload append to ensure that the boxes will always be ordered"""
-        super(BboxList, self).append(bb)
-        if len(self) > 1:
-            self.sort(key=lambda x: x.score, reverse=True)
+    # def append(self, bb):
+    #     """Overload append to ensure that the boxes will always be ordered"""
+    #     super(BboxList, self).append(bb)
+    #     if len(self) > 1:
+    #         self.sort(key=lambda x: x.score, reverse=True)
 
     def get_scores(self):
         """Return a list with the scores in the boxes order"""
@@ -253,14 +260,38 @@ class BboxList(list):
             out.append(bbox.crop(arr))
         return out
 
-    def filter(self, classes):
+    def sort(self, reverse=True):
+        temp = sorted(self, key=(lambda x: x.score), reverse=reverse)
         out = BboxList()
-        for _cls in classes:
-            for bbox in self:
-                if bbox.class_name == _cls:
-                    out.append(bbox)
+        for t in temp:
+            out.append(t)
         return out
 
+    def ioum(self):
+        """Returns a matrix of iou values among bboxes"""
+        out = np.zeros((len(self), len(self)), dtype=np.float)
+        for i, abb in enumerate(self):
+            for j, bbb in enumerate(self):
+                out[i, j] = abb.iou(bbb)
+        
+        return out
+
+    def remove_overlap(self, iou_th=0.5, copy=False):
+        """Remove all bboxes that has overlap grater than `iou_th`, keep largest score bbox.
+        Returns: a new bbox list, bboxes are not copied by default.
+        """
+        # TODO: Implement copy
+        to_keep = BboxList()
+        iou_matrix = self.ioum()
+        triang = np.tril(iou_matrix, 1)
+        args = np.argmax(triang, axis=1)
+        for i, j in enumerate(args):
+            if self[i].score > self[j].score:
+                to_keep.append(self[i])
+            else:
+                to_keep.append(self[j])
+        to_keep.sort()
+        return to_keep
 
 class SegInstance(object):
     def __init__(self,  _id, score, mask, class_name):
@@ -271,30 +302,6 @@ class SegInstance(object):
 
     def __repr__(self):
         return 'SegInstance(name={}, _id={}, score={}, mask=...)'.format(self.class_name, self.class_id, self.score)
-
-    # @property
-    # def x1(self):
-    #     return self.bbox.x1
-    # @property
-    # def x2(self):
-    #     return self.bbox.x2
-
-    # @property
-    # def y1(self):
-    #     return self.bbox.y1
-
-    # @property
-    # def y2(self):
-    #     return self.bbox.y2
-
-    # def draw_bbox(self, img, copy=True):
-    #     img = self.bbox.draw(img, copy=copy)
-    #     return img
-
-    # def crop_bbox(self, arr):
-    #     arr = self.bbox.crop_image(arr)
-    #     return arr
-
 
 class SegList(list):
 

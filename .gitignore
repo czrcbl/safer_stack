@@ -1,5 +1,5 @@
 .vscode/
-models/sand_mine
+models/sand_mine/*
 data/
 
 # Created by https://www.gitignore.io/api/ros

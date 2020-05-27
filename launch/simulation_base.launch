@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    
+    <arg name="urdf" default="vlp16_bumblebee" />
+    <arg name="tag" default="false"/>
+
+    <include file="$(find safer_stack)/launch/spawn/sand_mine.launch"></include>
+
+    <include file="$(find safer_stack)/launch/spawn/spawn_husky.launch">
+        <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg urdf).urdf.xacro" />
+    </include>
+    
+
+    <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
+
+</launch>

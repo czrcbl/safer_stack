@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-    <node pkg="rtabmap_ros" type="rtabmap" name="rtabmap" output="screen" args="-d">
+    <node ns='rtabmap' pkg="rtabmap_ros" type="rtabmap" name="rtabmap" output="screen" args="-d">
         <param name="subscribe_rgbd"       type="bool" value="false"/>
         <param name="frame_id"             type="string" value="base_link"/>
         <param name="subscribe_depth"      type="bool" value="false"/>
@@ -33,4 +33,5 @@
         <param name="Grid/MaxObstacleHeight"         type="string" value="1.5"/>    
     </node>
 
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/rtabmap_lidar.rviz" output="screen"/>
 </launch>

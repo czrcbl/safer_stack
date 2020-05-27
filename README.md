@@ -1,7 +1,16 @@
 # SAFER STACK
 
-# Docker Setup
-The `docker` folder contain a Docker file for `melodic` and `noetic` distribution.
+Safer Stack project repository.
+
+## Installation
+
+The project can be run in the provided docker container or be installed on a Ubuntu18.04 machine.
+
+In both installation scenarios, the `sand_mine` model has to be copied to `~/gazebo/models` folder.
+
+## Docker Setup
+The `docker` folder contain a Docker file for `melodic`, porting to `noetic` is planned.
+
 Docker deployment is the preferred way.
 
 Install [Docker](https://docs.docker.com/engine/install/).
@@ -11,6 +20,7 @@ Default (edit `docker/create_container.sh` to change default):
 ```bash
 mkdir -p ~/Docker/safer_stack/catkin_ws/src
 ```
+
 Clone this repository inside the src folder.
 
 Build the image
@@ -18,56 +28,31 @@ Build the image
 cd /docker/{ros-distro}
 docker build --tag safer_stack .
 ```
+
+The Dockerfile creates a user already, called `ros` (password: `ros`).
 In order to run the container:
 ```bash
 sh docker/create_container.sh
 ```
-Note that in order to display the graphical interfaces on host, a method that may be unsafe is used by this script.
 
-Run `sh /post_install.sh` to create the catkin workspace and add the setup files to .bashrc on the `ros` user.
+Run `sh /post_install.sh` inside the image to create the catkin workspace and add the setup files to `.bashrc` on the `ros` user.
 
 Then run `install.sh` to install the python dependencies locally.
 
+## Normal Installation
 
+In order to run the project on an Ubuntu18.04 machie, install the required packages: 
 
-
-## Installation
-
-Required packages:  
-`ros-melodic-husky-gazebo ros-melodic-velodyne-* ros-melodic-apriltag-ros python3-empy catkin build`
-
-
-Workspace creation with `python3` support:
-
-First, install some build dependencies:
+Required packages: 
 ```bash
-sudo apt-get install python-catkin-tools python3-dev python3-pip
-```
-
-```bash
-pip3 install catkin_pkg numpy rospkg opencv-python
-```
-
-Now configure the workspace with `python3`:
-```bash
-mkdir ~/catkin_ws
-cd ~/catkin_ws
-mkdir src
-catkin config -DPYTHON_EXECUTABLE=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3.6m -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so
-#catkin config --install
-catkin config --no-install
-```
-
-Now clone the required packages:
-```bash
-cd ~/catkin_ws/src
-git clone -b melodic https://github.com/ros-perception
-```
-
-Bumblebee2 support:
-
-```bash
-sudo apt-get install ros-melodic-pointgrey-camera-driver ros-melodic-pointgrey-camera-description
+apt-get -y install ros-melodic-pointgrey-camera-driver \
+    ros-melodic-pointgrey-camera-description \
+    ros-melodic-husky-gazebo \
+    ros-melodic-velodyne-* \
+    ros-melodic-apriltag-ros \
+    ros-melodic-teleop-twist-keyboard \
+    ros-melodic-rtabmap-ros \
+    python3-empy
 ```
 
 Then:

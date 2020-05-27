@@ -150,6 +150,22 @@ class Bbox(object):
         cv2.putText(img, text, (int(self.x1), int(self.y1 - vert)), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, thickness)
         return img
 
+    def iou(self, other):
+
+        A1 = (self.x2 - self.x1) * (self.y2 - self.y1) 
+        A2 = (other.x2 - other.x1) * (other.y2 - other.y1) 
+        inter = ( max(self.x1, other.x1) - min(self.x2, other.x2) ) * \
+            ( max(self.y1, other.y1) - min(self.y2, other.y2) )
+
+        IOU = inter / (A1 + A2 - inter)
+
+        return IOU
+
+    def iouc(self, other):
+        if self.class_name != other.class_name:
+            return -1
+        else:
+            return self.iou(other)
 
 def get_position(val, l):
     for i, e in enumerate(l):
@@ -159,8 +175,8 @@ def get_position(val, l):
 
 class BboxList(list):
     
-    def __init__(self):
-        super(list, self).__init__()
+    def __init__(self, *args, **kargs):
+        super(list, self).__init__(*args, **kargs)
         self.th = None
         self.all_classes = None
 
@@ -225,10 +241,17 @@ class BboxList(list):
 
     def draw(self, img):
         """Draw all bounding boxes in inverse order, to focus on higher score boxes."""
+        img = np.copy(img)
         for bbox in self[::-1]:
             img = bbox.draw(img)
 
         return img
+
+    def crop(self, arr):
+        out = []
+        for bbox in self:
+            out.append(bbox.crop(arr))
+        return out
 
     def filter(self, classes):
         out = BboxList()
@@ -240,38 +263,37 @@ class BboxList(list):
 
 
 class SegInstance(object):
-    def __init__(self,  _id, score, bbox, mask, class_name):
+    def __init__(self,  _id, score, mask, class_name):
         self.class_name = class_name
         self.score = score
         self.class_id = int(_id)
-        self.bbox = Bbox(bbox, _id, score, class_name)
         self.mask = mask
 
     def __repr__(self):
-        return 'SegInstance(name={}, _id={}, score={}, bbox={}, mask=...)'.format(self.class_name, self.class_id, self.score, self.bbox)
+        return 'SegInstance(name={}, _id={}, score={}, mask=...)'.format(self.class_name, self.class_id, self.score)
 
-    @property
-    def x1(self):
-        return self.bbox.x1
-    @property
-    def x2(self):
-        return self.bbox.x2
+    # @property
+    # def x1(self):
+    #     return self.bbox.x1
+    # @property
+    # def x2(self):
+    #     return self.bbox.x2
 
-    @property
-    def y1(self):
-        return self.bbox.y1
+    # @property
+    # def y1(self):
+    #     return self.bbox.y1
 
-    @property
-    def y2(self):
-        return self.bbox.y2
+    # @property
+    # def y2(self):
+    #     return self.bbox.y2
 
-    def draw_bbox(self, img, copy=True):
-        img = self.bbox.draw(img, copy=copy)
-        return img
+    # def draw_bbox(self, img, copy=True):
+    #     img = self.bbox.draw(img, copy=copy)
+    #     return img
 
-    def crop_bbox(self, arr):
-        arr = self.bbox.crop_image(arr)
-        return arr
+    # def crop_bbox(self, arr):
+    #     arr = self.bbox.crop_image(arr)
+    #     return arr
 
 
 class SegList(list):
@@ -280,7 +302,7 @@ class SegList(list):
         super(SegList, self).__init__()
 
     @classmethod
-    def from_arrays(self, classnames, ids,  scores, bboxes, masks):
+    def from_arrays(self, classnames, ids,  scores, masks):
         out = self()
         self.classnames = classnames
         for i in range(len(ids)):
@@ -288,26 +310,25 @@ class SegList(list):
             seg = SegInstance(
                     _id,
                     scores[i],
-                    bboxes[i, :],
                     masks[i, :, :],
                     classnames[_id]
                 )
             out.append(seg)
         return out
 
-    def draw_bboxes(self, img, copy=True):
-        if copy:
-            img = np.copy(img)
-        for seg in self[::-1]:
-            img = seg.draw_bbox(img, copy=False)
+    # def draw_bboxes(self, img, copy=True):
+    #     if copy:
+    #         img = np.copy(img)
+    #     for seg in self[::-1]:
+    #         img = seg.draw_bbox(img, copy=False)
 
-        return img
+    #     return img
 
-    def crop_bboxes(self, arr):
-        out = []
-        for seg in self:
-            out.append(seg.crop_bbox(arr))
-        return out
+    # def crop_bboxes(self, arr):
+    #     out = []
+    #     for seg in self:
+    #         out.append(seg.crop_bbox(arr))
+    #     return out
 
 
 

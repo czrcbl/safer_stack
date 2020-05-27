@@ -51,6 +51,7 @@ RUN apt-get -y install ros-melodic-pointgrey-camera-driver \
     ros-melodic-velodyne-* \
     ros-melodic-apriltag-ros \
     ros-melodic-teleop-twist-keyboard \
+    ros-melodic-rtabmap-ros \
     python3-empy
 
 # Install user utils
@@ -58,11 +59,12 @@ RUN apt install -y gedit \
     nano
 
 # Install Visual Studio Code For development
-RUN apt-get install -y software-properties-common apt-transport-https wget
-RUN wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | apt-key add -
-RUN add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
-RUN apt-get update \
-    && apt install -y code
+# RUN apt-get install -y software-properties-common apt-transport-https wget
+# RUN wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | apt-key add -
+# RUN add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+# RUN apt-get update \
+#   && apt install -y code
+
 # Add user
 ENV USER=ros \
     PASSWD=ros \

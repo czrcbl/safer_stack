@@ -3,7 +3,7 @@
 # Note that the /home/ros folder of the container will
 # be mounted on /home/Docker/safer_stack on host
 rosVersion=noetic
-containerName=ss
+containerName=ssn
 imageName=czrcbl/ros:cuda-noetic
 docker run -it \
     -p 8888:8888  \
@@ -16,7 +16,7 @@ docker run -it \
     --env="QT_X11_NO_MITSHM=1" \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     --name $containerName \
-    safer_stack
+    $imageName
 
 containerId=$(docker inspect --format="{{.Id}}" $containerName)
 # export containerId=$(docker ps -l -q)

@@ -141,4 +141,21 @@ class BaseAlgorithm(object):
         while not rospy.is_shutdown():
             rate.sleep()
             self.publish()
+
+
+def compute_distances(cloud, bboxlist, bbox_img_size, method='0'):
+
+    dists = []
+    rbboxes = [bbox.resize(bbox_img_size, cloud.shape[:2]) for bbox in bboxlist]
+    for rb in rbboxes:
+        class_name = rb.class_name
+        c = rb.crop_image(cloud)
+        c = c.reshape((-1, 3))
+        idx = ~np.isnan(c[:, 0]) 
+        c = c[idx, :]
+        d = np.mean(c, axis=0)
+        d = np.sqrt(np.sum(d ** 2))
+        dists.append((class_name, d))
+
+    return dists
     

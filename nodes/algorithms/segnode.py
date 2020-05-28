@@ -13,7 +13,7 @@ import cv2
 import time
 import mxnet as mx
 
-from safer_stack.utils import pointcloud2_2_npxyz
+from safer_stack.utils import pointcloud2_2_npxyz, compute_distances
 from safer_stack.nn import Segmenter, Detector
 from safer_stack.tracking import Tracker
 
@@ -74,22 +74,22 @@ class ObstacleNN:
         return fps
 
 
-    def compute_distances(self, bboxlist, npim):
+    # def compute_distances(self, bboxlist, npim):
 
-        cloud = self.camera_cloud
-        dists = []
-        rbboxes = [bbox.resize(npim.shape[:2], cloud.shape[:2]) for bbox in bboxlist]
-        for rb in rbboxes:
-            class_name = rb.class_name
-            c = rb.crop_image(cloud)
-            c = c.reshape((-1, 3))
-            idx = ~np.isnan(c[:, 0]) 
-            c = c[idx, :]
-            d = np.mean(c, axis=0)
-            d = np.sqrt(np.sum(d ** 2))
-            dists.append((class_name, d))
+    #     cloud = self.camera_cloud
+    #     dists = []
+    #     rbboxes = [bbox.resize(npim.shape[:2], cloud.shape[:2]) for bbox in bboxlist]
+    #     for rb in rbboxes:
+    #         class_name = rb.class_name
+    #         c = rb.crop_image(cloud)
+    #         c = c.reshape((-1, 3))
+    #         idx = ~np.isnan(c[:, 0]) 
+    #         c = c[idx, :]
+    #         d = np.mean(c, axis=0)
+    #         d = np.sqrt(np.sum(d ** 2))
+    #         dists.append((class_name, d))
 
-        return dists
+    #     return dists
 
     def publish(self):
         
@@ -108,7 +108,7 @@ class ObstacleNN:
         
         print('Model Execution Time:', time.time() - tic)
         bboxlist = bboxlist.remove_overlap()
-        dists = self.compute_distances(bboxlist, npim)
+        dists = compute_distances(cloud, bboxlist, npim.shape[:2])
         print(dists)
         dim = bboxlist.draw(npim)
         # tbboxes = self.tracker.track(bboxlist)

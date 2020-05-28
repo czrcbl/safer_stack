@@ -12,9 +12,9 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 
 from scipy.spatial.transform import Rotation
-from utils import pointcloud2_2_npxyz
+from safer_stack.utils import pointcloud2_2_npxyz
 
-from utils import BaseAlgorithm
+# from utils import BaseAlgorithm
 
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
@@ -470,7 +470,7 @@ class CameraDistOdom:
         self.pub_crest.publish(self.crest)
 
         header = Header()
-        header.frame_id = 'odom'
+        header.frame_id = 'base_link'
         header.seq = self.seq
         self.seq += 1
         header.stamp = rospy.Time.now()
@@ -495,9 +495,9 @@ def listener():
 
     # distcamera = DistanceCamera(camera_cloud_topic='/bumblebee2/point_cloud_transformed')
     distcamera = CameraDistOdom(
-        edge_topic='rtabmap/edge_distance',
-        crest_topic='rtabmap/crest',
-        crest_cloud_topic='rtabmap/crest_cloud',
+        edge_topic='/rtabmap/edge_distance',
+        crest_topic='/rtabmap/crest',
+        crest_cloud_topic='/rtabmap/crest_cloud',
         camera_cloud_topic='/rtabmap/cloud_ground'
         )
     distcamera.run()

@@ -2,6 +2,7 @@ from __future__ import division, print_function, absolute_import
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 
 def center_width_height2xyxy(data):
@@ -33,15 +34,12 @@ def xyxy2center_width_height(data):
 class Bbox(object):
 
     def __init__(self, coords, _id, score, class_name, parent=None):
-        # self.x1 = coords[0] # left top
-        # self.y1 = coords[1] # left top
-        # self.x2 = coords[2] # right bottom
-        # self.y2 = coords[3] # right bottom
         self.bbox = coords
         self.class_id = int(_id)
         self.score = score
         self.parent = parent
         self.class_name = class_name
+        self.id = None # used by tracking algorithm
         
     def __repr__(self):
         return 'Bbox({:.2f}, {:.2f}, {:.2f}, {:.2f}, class_id={}, score={:.2f}, class_name=\'{}\')'.format(self.x1, self.y1, self.x2, self.y2, self.class_id, self.score, self.class_name)
@@ -74,13 +72,16 @@ class Bbox(object):
     def center_width_height(self):
         return xyxy2center_width_height(self.xyxy)
 
+    def copy(self):
+        return deepcopy(self)
+
     def resize(self, orig_size, target_size):
 
         in_height, in_width = orig_size
         t_height, t_width = target_size
 
-        width_ratio = in_width / t_width
-        height_ratio = in_height / t_height
+        width_ratio = t_width / in_width
+        height_ratio = t_height / in_height 
 
         rep = np.array([width_ratio, height_ratio, width_ratio, height_ratio])
         rscaled_bbox = self.bbox * rep
@@ -89,17 +90,13 @@ class Bbox(object):
 
     def crop_image(self, img, border=0.0):
         """Return the original image cropped on the bounding box limits
-        border: percentage of the bounding box width and height to enlager the bbox
+        border: percentage of the bounding box width and height to enlarger the bbox
         """
         h, w = img.shape[:2]
-        
         # percentage of bbox dimensions
-        bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
-        i1 = int(np.max([0, self.y1 - bbh * border / 2.0]))
-        i2 = int(np.min([h, self.y2 + bbh * border / 2.0]))
-        j1 = int(np.max([0, self.x1 - bbw * border / 2.0]))
-        j2 = int(np.min([w, self.x2 + bbw * border / 2.0]))
-        cropped = img[i1: i2, j1: j2]
+        # bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
+
+        cropped = img[int(self.y1): int(self.y2), int(self.x1): int(self.x2)]
 
         # # percentage of total image dimensions
         # i1 = int(np.max([0, self.y1 - h * border / 2.0]))
@@ -109,6 +106,29 @@ class Bbox(object):
         # cropped = img[i1: i2, j1: j2]
 
         return cropped
+
+    # def crop_image(self, img, border=0.0):
+    #     """Return the original image cropped on the bounding box limits
+    #     border: percentage of the bounding box width and height to enlarger the bbox
+    #     """
+    #     h, w = img.shape[:2]
+        
+    #     # percentage of bbox dimensions
+    #     bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
+    #     i1 = int(np.max([0, self.y1 - bbh * border / 2.0]))
+    #     i2 = int(np.min([h, self.y2 + bbh * border / 2.0]))
+    #     j1 = int(np.max([0, self.x1 - bbw * border / 2.0]))
+    #     j2 = int(np.min([w, self.x2 + bbw * border / 2.0]))
+    #     cropped = img[i1: i2, j1: j2]
+
+    #     # # percentage of total image dimensions
+    #     # i1 = int(np.max([0, self.y1 - h * border / 2.0]))
+    #     # i2 = int(np.min([h, self.y2 + h * border / 2.0]))
+    #     # j1 = int(np.max([0, self.x1 - w * border / 2.0]))
+    #     # j2 = int(np.min([w, self.x2 + w * border / 2.0]))
+    #     # cropped = img[i1: i2, j1: j2]
+
+    #     return cropped
 
     def mask_image(self, img=None):
 
@@ -150,7 +170,10 @@ class Bbox(object):
         color = [x * 255 for x in color]
         thickness = 1 + int(img.shape[1]/300)
         cv2.rectangle(img, (int(self.x1), int(self.y1)), (int(self.x2), int(self.y2)), color, thickness)
-        text = '{} {:d}%'.format(self.class_name, int(self.score * 100))
+        if self.id is None:
+            text = '{} {:d}%'.format(self.class_name, int(self.score * 100))
+        else:
+            text = '{} {:d}% ID:{:d}'.format(self.class_name, int(self.score * 100), self.id)
         font_scale = 0.5/600 * width
         thickness = int(2/600 * width)
         vert = 10/1080 * height
@@ -173,6 +196,7 @@ class Bbox(object):
             return -1
         else:
             return self.iou(other)
+
 
 def get_position(val, l):
     for i, e in enumerate(l):

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from safer_stack.outputs import Bbox, BboxList, SegInstance, SegList
-from safer_stack.tracking import Tracker
+from safer_stack.tracking import Tracker, MultiTracker
 
 proj_path = os.path.dirname(
     os.path.dirname(
@@ -41,18 +41,40 @@ class TestOutputs(unittest.TestCase):
         self.assertEqual(IOU, 0.25)
 
     def test_tracker(self):
+        # 'KCF'
+        t = Tracker('CSRT')
+        status = t.init(self.im, self.sample_bb)
+        self.assertTrue(status)
 
-        t = Tracker()
-        bb = self.sample_bb
-        bblist = BboxList()
-        bblist.append(bb)
-        # print(bblist)
-        for i in range(5):
-            out = t.track(bblist)
-            if i in [0, 1, 2]:
-                self.assertEqual(len(out), 0)
-            else:
-                self.assertEqual(len(out), 1)
+        status, bbox = t.update(self.im)
+        self.assertTrue(status)
+        # print(bbox.xyxy)
+        # print(self.sample_bb.bbox)
+
+    def test_multitracker(self):
+
+        mt = MultiTracker()
+        bboxes = mt.update(self.im, [self.sample_bb])
+        print(bboxes)
+        self.assertEqual(len(bboxes), 1)
+        bboxes = mt.update(self.im)
+        self.assertEqual(len(bboxes), 1)
+        print(bboxes)
+        bb = Bbox([100, 100, 150, 150] , 0, 0.7, 'class0')
+        bboxes = mt.update(self.im, [bb])
+        self.assertEqual(len(bboxes), 2)
+        print(bboxes)
+        
+        # bb = self.sample_bb
+        # bblist = BboxList()
+        # bblist.append(bb)
+        # # print(bblist)
+        # for i in range(5):
+        #     out = t.track(bblist)
+        #     if i in [0, 1, 2]:
+        #         self.assertEqual(len(out), 0)
+        #     else:
+        #         self.assertEqual(len(out), 1)
 
         # seg, info = self.predictor.panoptic(img)
         # data = self.predictor(self.im)

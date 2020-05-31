@@ -11,8 +11,6 @@ import numpy as np
 import os
 from cv_bridge import CvBridge, CvBridgeError
 
-project_path = os.path.abspath(os.path.realpath(os.path.dirname(os.path.dirname(__file__))))
-
 
 def create_twist_message(linear, angular=[0,0,0]):
     """

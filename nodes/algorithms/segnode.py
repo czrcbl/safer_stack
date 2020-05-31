@@ -13,14 +13,15 @@ import cv2
 import time
 import mxnet as mx
 
+import matplotlib.pyplot as plt
 from safer_stack.utils import pointcloud2_2_npxyz, compute_distances
 from safer_stack.nn import Segmenter, Detector
-from safer_stack.tracking import Tracker
+from safer_stack.tracking import MultiTracker
 
 
 class ObstacleNN:
 
-    def __init__(self, model_type='segmentation'):
+    def __init__(self, model_type='segmentation', frames_per_det=30):
         
         self.model_type = model_type
 
@@ -29,7 +30,15 @@ class ObstacleNN:
         elif model_type == 'segmentation':
             self.predictor = Segmenter(ctx=mx.gpu())
 
-        self.tracker = Tracker()
+        # NN
+        self.th = 0.7
+        self.predictions = None
+        self.first_trigg = True
+
+        self.tracker = MultiTracker()
+        self.iter = 0
+
+        self.frames_per_det = frames_per_det # number of frames between new CNN predictions are added.
 
         self.color_img = None
         self.rect_img = None
@@ -51,6 +60,12 @@ class ObstacleNN:
         
     def color_img_callback(self, data):
         self.color_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
+        # self.color_img is RGB
+        
+        if self.first_trigg:
+            self.apply_network()
+            self.first_trigg = False
+        
         self.publish()
 
     def rect_img_callback(self, data):
@@ -91,26 +106,81 @@ class ObstacleNN:
 
     #     return dists
 
+    def apply_network(self, event=None):
+        im = self.color_img
+        if im is None: return
+        th = self.th
+        tic = time.time()
+
+        if self.model_type == 'detection':
+            bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
+            
+        elif self.model_type == 'segmentation':
+            seglist, bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
+
+        print('Model Execution Time:', time.time() - tic)
+        
+        bboxlist = bboxlist.remove_overlap()
+
+        self.predictions = bboxlist
+
+
+
     def publish(self):
         
         if self.color_img is None: return
         if self.camera_cloud is None: return
 
-        im = self.color_img[:, :, ::-1]
+        # im = self.color_img[:, :, ::-1] # Convert to BGR
+        im = self.color_img # Keep RGB
+        
+        # plt.imshow(im)
+        # plt.show()
+        
         cloud = self.camera_cloud
         th = 0.7
-        tic = time.time()
-        if self.model_type == 'detection':
-            bboxlist, npim = self.predictor.detect(im, th=th)
-            
-        elif self.model_type == 'segmentation':
-            seglist, bboxlist, npim = self.predictor.detect(im, th=th)
         
-        print('Model Execution Time:', time.time() - tic)
-        bboxlist = bboxlist.remove_overlap()
-        dists = compute_distances(cloud, bboxlist, npim.shape[:2])
+        ##############################
+
+        # if (self.iter % self.frames_per_det) == 0:
+
+        #     tic = time.time()
+
+        #     if self.model_type == 'detection':
+        #         bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
+                
+        #     elif self.model_type == 'segmentation':
+        #         seglist, bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
+
+        #     print('Model Execution Time:', time.time() - tic)
+            
+        #     bboxlist = bboxlist.remove_overlap()
+            
+        #     bboxlist = self.tracker.update(im, bboxlist)
+
+        # else:
+        #     bboxlist = self.tracker.update(im)
+        
+        # self.iter += 1
+
+        ##########################3
+
+        # if self.model_type == 'detection':
+        #     bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
+            
+        # elif self.model_type == 'segmentation':
+        #     seglist, bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
+
+        ############################
+
+
+        
+        bboxlist = self.tracker.update(im, bboxlist=self.predictions)
+        self.predictions = None
+       
+        dists = compute_distances(cloud, bboxlist, im.shape[:2])
         print(dists)
-        dim = bboxlist.draw(npim)
+        dim = bboxlist.draw(im)
         # tbboxes = self.tracker.track(bboxlist)
         # dim = tbboxes.draw(npim)
     
@@ -118,7 +188,7 @@ class ObstacleNN:
         fps = self.fps()
         print('FPS:', fps)
 
-        cv2.imshow('Segmentation', dim[:,:,:])
+        cv2.imshow('Segmentation', dim[:,:,::-1])
         cv2.waitKey(3)
 
 
@@ -142,6 +212,8 @@ def listener():
 
     obsnn = ObstacleNN()
     
+    rospy.Timer(rospy.Duration(secs=5), obsnn.apply_network)
+
     # rate = rospy.Rate(30)
     while not rospy.is_shutdown():
         # rospy.loginfo('Message sent!')

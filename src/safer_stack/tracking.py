@@ -35,8 +35,9 @@ class Tracker:
         self.tracker = tracker
 
     def init(self, frame, bbox):
+        frame = frame[:, :, ::-1]
         self.currbbox = bbox
-        status = self.tracker.init(frame, tuple(bbox.center_width_height))
+        status = self.tracker.init(frame, tuple(bbox.xy_width_height))
         return status
 
     def update(self, frame):
@@ -49,7 +50,7 @@ class Tracker:
 
 class MultiTracker:
 
-    def __init__(self, tracker_type='CSRT', iou_th=0.5):
+    def __init__(self, tracker_type='KCF', iou_th=0.5):
         self.bboxmap = {}
         self.iou_th = iou_th
         self.tracker_type = tracker_type
@@ -58,7 +59,7 @@ class MultiTracker:
         return len(self.bboxmap)
 
     def update(self, frame, bboxlist=None):
-
+        frame = frame[:, :, ::-1]
         to_keep = {}
         
         for _id, tracker in self.bboxmap.items():
@@ -86,7 +87,10 @@ class MultiTracker:
         
         self.bboxmap = to_keep
 
-        return [t.currbbox for t in self.bboxmap.values()]
+        out = BboxList()
+        for t in self.bboxmap.values():
+            out.append(t.currbbox )
+        return out
 
 
 # class Tracker:    

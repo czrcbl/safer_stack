@@ -72,6 +72,10 @@ class Bbox(object):
     def center_width_height(self):
         return xyxy2center_width_height(self.xyxy)
 
+    @property
+    def xy_width_height(self):
+        return np.array([self.x1, self.y1, self.x2 - self.x1, self.y2 - self.y1])
+
     def copy(self):
         return deepcopy(self)
 
@@ -305,6 +309,10 @@ class BboxList(list):
         Returns: a new bbox list, bboxes are not copied by default.
         """
         # TODO: Implement copy
+        
+        if len(self) in [0, 1]:
+            return self
+
         to_keep = BboxList()
         iou_matrix = self.ioum()
         triang = np.tril(iou_matrix, 1)
@@ -316,6 +324,15 @@ class BboxList(list):
                 to_keep.append(self[j])
         to_keep.sort()
         return to_keep
+
+    def resize(self, orig_size, target_size, copy=False):
+        out = BboxList()
+        for bbox in self:
+            out.append(bbox.resize(orig_size, target_size))
+
+        return out
+
+
 
 class SegInstance(object):
     def __init__(self,  _id, score, mask, class_name):

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import os
 os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
 import numpy as np
@@ -76,10 +77,16 @@ class Segmenter(BasePredictor):
         self.transform = Segmenter.available_models[backend]
         super(Segmenter, self).__init__(backend=backend, ctx=ctx)
 
-    def detect(self, img, th=0.5):
+    def detect(self, img, th=0.5, keep_size=True):
         (ids, scores, bboxes, masks), npim = super(Segmenter, self).detect(img, th)
         seglist = SegList.from_arrays(self.classnames, ids, scores, masks)
         bboxlist = BboxList.from_arrays(ids, scores, bboxes, class_names = self.classnames)
+
+        if keep_size:
+            target_size=img.shape[:2]
+            orig_size = npim.shape[:2]
+            bboxlist, npim = bboxlist.resize(orig_size, target_size), img
+
         return  seglist, bboxlist, npim
 
 
@@ -91,15 +98,23 @@ class Detector(BasePredictor):
         'faster_rcnn_resnet50_v1b_coco': FasterRCNNDefaultTransform(short=600, max_size=1000)
     }
 
-    def __init__(self, backend='ssd_512_mobilenet1.0_coco', ctx=mx.gpu()):
+    def __init__(self, backend='faster_rcnn_resnet50_v1b_coco', ctx=mx.gpu()):
         if backend not in Detector.available_models.keys():
             raise ValueError('Backend {} no available, available backends: {}'.format(backend, Detector.available_models.keys()))
         self.transform = Detector.available_models[backend]
         super(Detector, self).__init__(backend=backend, ctx=ctx)
 
-    def detect(self, img, th=0.5):
+    def detect(self, img, th=0.5, keep_size=True):
+        
         (ids, scores, bboxes), npim = super(Detector, self).detect(img, th)
-        return BboxList.from_arrays(ids, scores, bboxes, class_names = self.classnames), npim
+        bboxlist = BboxList.from_arrays(ids, scores, bboxes, class_names = self.classnames)
+        
+        if keep_size:
+            target_size = img.shape[:2]
+            orig_size = npim.shape[:2]
+            return bboxlist.resize(orig_size, target_size), img
+        else:
+            return bboxlist, npim
 
 
 

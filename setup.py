@@ -9,7 +9,7 @@ setup_args = generate_distutils_setup(
           'numpy',
           'mxnet-cu102',
           'gluoncv',
-          'opnecv-python'
+          'opnecv-contrib-python'
       ]
 )
 

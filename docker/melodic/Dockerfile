@@ -52,6 +52,7 @@ RUN apt-get -y install ros-melodic-pointgrey-camera-driver \
     ros-melodic-apriltag-ros \
     ros-melodic-teleop-twist-keyboard \
     ros-melodic-rtabmap-ros \
+    ros-melodic-move-base \
     python3-empy
 
 # Install user utils

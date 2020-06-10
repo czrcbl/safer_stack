@@ -92,38 +92,15 @@ class Bbox(object):
         
         return Bbox(rscaled_bbox, self.class_id, self.score, self.class_name)
 
-    def crop_image(self, img, border=0.0):
-        """Return the original image cropped on the bounding box limits
-        border: percentage of the bounding box width and height to enlarger the bbox
-        """
-        h, w = img.shape[:2]
-        # percentage of bbox dimensions
-        # bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
-
-        cropped = img[int(self.y1): int(self.y2), int(self.x1): int(self.x2)]
-
-        # # percentage of total image dimensions
-        # i1 = int(np.max([0, self.y1 - h * border / 2.0]))
-        # i2 = int(np.min([h, self.y2 + h * border / 2.0]))
-        # j1 = int(np.max([0, self.x1 - w * border / 2.0]))
-        # j2 = int(np.min([w, self.x2 + w * border / 2.0]))
-        # cropped = img[i1: i2, j1: j2]
-
-        return cropped
-
     # def crop_image(self, img, border=0.0):
     #     """Return the original image cropped on the bounding box limits
     #     border: percentage of the bounding box width and height to enlarger the bbox
     #     """
     #     h, w = img.shape[:2]
-        
     #     # percentage of bbox dimensions
-    #     bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
-    #     i1 = int(np.max([0, self.y1 - bbh * border / 2.0]))
-    #     i2 = int(np.min([h, self.y2 + bbh * border / 2.0]))
-    #     j1 = int(np.max([0, self.x1 - bbw * border / 2.0]))
-    #     j2 = int(np.min([w, self.x2 + bbw * border / 2.0]))
-    #     cropped = img[i1: i2, j1: j2]
+    #     # bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
+
+    #     cropped = img[int(self.y1): int(self.y2), int(self.x1): int(self.x2)]
 
     #     # # percentage of total image dimensions
     #     # i1 = int(np.max([0, self.y1 - h * border / 2.0]))
@@ -133,6 +110,29 @@ class Bbox(object):
     #     # cropped = img[i1: i2, j1: j2]
 
     #     return cropped
+
+    def crop_image(self, img, border=0.0):
+        """Return the original image cropped on the bounding box limits
+        border: percentage of the bounding box width and height to enlarger the bbox
+        """
+        h, w = img.shape[:2]
+        
+        # percentage of bbox dimensions
+        bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
+        i1 = int(np.max([0, self.y1 - bbh * border / 2.0]))
+        i2 = int(np.min([h, self.y2 + bbh * border / 2.0]))
+        j1 = int(np.max([0, self.x1 - bbw * border / 2.0]))
+        j2 = int(np.min([w, self.x2 + bbw * border / 2.0]))
+        cropped = img[i1: i2, j1: j2]
+
+    #     # # percentage of total image dimensions
+    #     # i1 = int(np.max([0, self.y1 - h * border / 2.0]))
+    #     # i2 = int(np.min([h, self.y2 + h * border / 2.0]))
+    #     # j1 = int(np.max([0, self.x1 - w * border / 2.0]))
+    #     # j2 = int(np.min([w, self.x2 + w * border / 2.0]))
+    #     # cropped = img[i1: i2, j1: j2]
+
+        return cropped
 
     def mask_image(self, img=None):
 
@@ -155,7 +155,7 @@ class Bbox(object):
   
         return out
     
-    def draw(self, img, copy=True):
+    def draw(self, img, copy=True, extra_text=''):
         """Draw bbox on image, expect an int image"""
 
         if img.dtype == np.float:
@@ -175,9 +175,9 @@ class Bbox(object):
         thickness = 1 + int(img.shape[1]/300)
         cv2.rectangle(img, (int(self.x1), int(self.y1)), (int(self.x2), int(self.y2)), color, thickness)
         if self.id is None:
-            text = '{} {:d}%'.format(self.class_name, int(self.score * 100))
+            text = '{} {:d}% {}'.format(self.class_name, int(self.score * 100), extra_text)
         else:
-            text = '{} {:d}% ID:{:d}'.format(self.class_name, int(self.score * 100), self.id)
+            text = '{} {:d}% ID:{:d} {}'.format(self.class_name, int(self.score * 100), self.id, extra_text)
         font_scale = 0.5/600 * width
         thickness = int(2/600 * width)
         vert = 10/1080 * height
@@ -315,14 +315,21 @@ class BboxList(list):
 
         to_keep = BboxList()
         iou_matrix = self.ioum()
-        triang = np.tril(iou_matrix, 1)
+        triang = np.tril(iou_matrix, 0) > iou_th
         args = np.argmax(triang, axis=1)
+        # print(triang)
+        # xi, yi = np.nonzero(triang)
+        # pairs = set()
+        # for i, j in zip(xi, yi):
+        #     pairs.add((i, j))
+        # print(pairs)
         for i, j in enumerate(args):
+            
             if self[i].score > self[j].score:
                 to_keep.append(self[i])
             else:
                 to_keep.append(self[j])
-        to_keep.sort()
+        to_keep = to_keep.sort()
         return to_keep
 
     def resize(self, orig_size, target_size, copy=False):

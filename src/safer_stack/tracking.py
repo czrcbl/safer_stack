@@ -51,46 +51,110 @@ class Tracker:
 class MultiTracker:
 
     def __init__(self, tracker_type='KCF', iou_th=0.5):
-        self.bboxmap = {}
+        self.trackermap = {}
         self.iou_th = iou_th
         self.tracker_type = tracker_type
 
     def __len__(self):
-        return len(self.bboxmap)
+        return len(self.trackermap)
 
     def update(self, frame, bboxlist=None):
         frame = frame[:, :, ::-1]
-        to_keep = {}
-        
-        for _id, tracker in self.bboxmap.items():
+        out_bboxes = BboxList()
+        for _id, tracker in self.trackermap.items():
             status, bbox = tracker.update(frame)
             if status:
-                to_keep[_id] = tracker
-        
+                out_bboxes.append(bbox)
+      
         if bboxlist is not None:
-            to_keep2 = {}
             for inbbox in bboxlist:
-                ignore = False
-                for _id, tracker in to_keep.items():
-                    IOU = inbbox.iouc(tracker.currbbox)
-                    if IOU > self.iou_th:  
-                        ignore = True
-                if not ignore:
+                keep_id = False
+                for outbbox in out_bboxes:
+                    IOU = inbbox.iou(outbbox)
+                    if (IOU > self.iou_th) and (inbbox.class_id == outbbox.class_id):
+                        keep_id = True
+                        break
+                if keep_id:
+                    inbbox.id = outbbox.id
+                else:
                     new_id = np.random.randint(0, 100)
+                    while new_id in self.trackermap.keys():
+                        new_id = np.random.randint(0, 100)
                     inbbox.id = new_id
-                    t = Tracker(self.tracker_type)
-                    status = t.init(frame, inbbox)
-                    if status:
-                        to_keep2[new_id] = t
+                    
+                out_bboxes.append(inbbox)
 
-            to_keep.update(to_keep2) 
+        nobboxes = out_bboxes.remove_overlap(iou_th=self.iou_th)
+
+        _ids = [bb.id for bb in nobboxes]
+
+        to_keep = {}
+        for i, _id in enumerate(_ids):
+            if _id not in self.trackermap:
+                t = Tracker(self.tracker_type)
+                status = t.init(frame, nobboxes[i])
+                if status:
+                    to_keep[_id] = t
+            else:
+                to_keep[_id] = self.trackermap[_id]
+
+        self.trackermap = to_keep
         
-        self.bboxmap = to_keep
+        return nobboxes
 
-        out = BboxList()
-        for t in self.bboxmap.values():
-            out.append(t.currbbox )
-        return out
+    # def update(self, frame, bboxlist=None):
+    #     frame = frame[:, :, ::-1]
+    #     to_keep = {}
+        
+    #     # First keep the bboxes that are found on the new frame
+    #     to_keep1 = {}
+    #     tkbboxes = BboxList()
+    #     for _id, tracker in self.trackermap.items():
+    #         status, bbox = tracker.update(frame)
+    #         if status:
+    #             to_keep1[_id] = tracker
+    #             tkbboxes.append(bbox)
+
+    #     # Remove overlap on new bboxes:
+    #     tkbboxes = tkbboxes.remove_overlap()
+    #     for bb in tkbboxes:
+    #         to_keep[bb.id] = to_keep1[bb.id]
+        
+    #     # if there are new boboxes from the classifier check against
+    #     # the bboxes present in the current trackers
+    #     if bboxlist is not None:
+    #         to_keep2 = {}
+    #         for inbbox in bboxlist:
+    #             replace = False
+    #             ignore = False
+    #             for _id, tracker in to_keep.items():
+    #                 IOU = inbbox.iou(tracker.currbbox)
+    #                 if IOU > self.iou_th:
+    #                     if inbbox.score > tracker.currbbox.score:
+    #                         ignore = False
+    #                     else:
+    #                         to_keep2[_id] = tracker
+    #                         ignore = True 
+    #                     break
+    #                 else:
+    #                     to_keep2[_id] = tracker
+
+    #             if not ignore:
+    #                 new_id = np.random.randint(0, 100)
+    #                 while new_id in self.trackermap.keys():
+    #                     new_id = np.random.randint(0, 100)
+    #                 inbbox.id = new_id
+    #                 t = Tracker(self.tracker_type)
+    #                 status = t.init(frame, inbbox)
+    #                 if status:
+    #                     to_keep2[new_id] = t
+
+    #     self.trackermap = to_keep2
+
+    #     out = BboxList()
+    #     for t in self.trackermap.values():
+    #         out.append(t.currbbox)
+    #     return out
 
 
 # class Tracker:    

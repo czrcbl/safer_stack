@@ -141,18 +141,23 @@ class BaseAlgorithm(object):
             self.publish()
 
 
-def compute_distances(cloud, bboxlist, bbox_img_size, method='0'):
+def compute_distances(cloud, bboxlist, border=0.0, metric='min'):
 
     dists = []
-    rbboxes = [bbox.resize(bbox_img_size, cloud.shape[:2]) for bbox in bboxlist]
-    for rb in rbboxes:
-        class_name = rb.class_name
-        c = rb.crop_image(cloud)
+    # rbboxes = [bbox.resize(bbox_img_size, cloud.shape[:2]) for bbox in bboxlist]
+    for bb in bboxlist:
+        class_name = bb.class_name
+        c = bb.crop_image(cloud, border=border)
         c = c.reshape((-1, 3))
         idx = ~np.isnan(c[:, 0]) 
         c = c[idx, :]
-        d = np.mean(c, axis=0)
-        d = np.sqrt(np.sum(d ** 2))
+        if metric=='min':
+            ds = np.sqrt(np.sum(c ** 2, axis=1))
+            d = np.min(ds)
+        elif metric=='mean':
+            d = np.mean(c, axis=0)
+            d = np.sqrt(np.sum(d ** 2))
+        
         dists.append((class_name, d))
 
     return dists

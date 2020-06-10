@@ -214,3 +214,7 @@ add_dependencies(test_pcl safer_stack_generate_messages_cpp)
 add_executable(tf_pointcloud nodes/utils/tf_pointcloud.cpp)
 target_link_libraries(tf_pointcloud ${catkin_LIBRARIES})
 add_dependencies(tf_pointcloud safer_stack_generate_messages_cpp)
+
+add_executable(segment_obstacles nodes/utils/segment_obstacles.cpp)
+target_link_libraries(segment_obstacles ${catkin_LIBRARIES})
+add_dependencies(segment_obstacles safer_stack_generate_messages_cpp)

@@ -15,5 +15,5 @@
         <!-- <arg name="odom_topic"              default="/odom"/>         Odometry topic used if visual_odometry is false -->
     </include>
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/rtabmap_stereo.rviz" output="screen"/>
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/rtabmap_stereo.rviz" output="screen"/> -->
 </launch>

@@ -15,7 +15,7 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 catkin build
 source ~/.bashrc
 
-
+pip install scikit-learn
 pip install mxnet-cu102 gluoncv
 pip install gluoncv
 # Python dependencies with pip

@@ -8,7 +8,6 @@ from apriltag_ros.msg import AprilTagDetectionArray
 import numpy as np
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-# from safer_stack.utils import create_message
 
 
 class Interface:
@@ -49,7 +48,7 @@ class Interface:
             return
         # np_image = np.asarray(cv_image)
         image = self.draw_image()
-        cv2.imshow('Rear Camera - {}'.format(self.edge_distance_topic), cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        cv2.imshow('Rear Camera', cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         cv2.waitKey(3)
 
 

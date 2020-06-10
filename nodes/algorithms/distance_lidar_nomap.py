@@ -28,11 +28,7 @@ class DistanceLidar:
         
         th = rospy.get_param('xdiff_threshold')
         cloud = self.lidar_cloud.squeeze()
-        # print(cloud.shape)
-        # print(cloud[:, 1], cloud[:, 0])
         angles = np.arctan2(cloud[:, 1], cloud[:, 0])
-        # print(np.max(angles))
-        # print(angles)
         ang_mask = np.logical_and(angles < np.pi / 6, angles > -np.pi/6)
         # print(ang_mask.sum())
         fcloud = cloud[ang_mask, :]
@@ -64,11 +60,6 @@ class DistanceLidar:
     
 def listener():
 
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # name are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
     rospy.init_node('distance_lidar', anonymous=True)
     distlidar = DistanceLidar(
         edge_topic='/lidar/edge_distance',

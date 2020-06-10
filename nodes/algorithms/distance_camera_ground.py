@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# ROS imports
 import rospy
 from std_msgs.msg import Float32, Header
 from nav_msgs.msg import Odometry
@@ -6,22 +7,25 @@ from sensor_msgs.msg import PointCloud2, Image
 import sensor_msgs.point_cloud2 as pc2
 from rospy.numpy_msg import numpy_msg
 from tf.transformations import euler_from_quaternion, quaternion_from_matrix
+
+# Utils
+import sys
+
+# Math
 import numpy as np
 import message_filters
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
-
 from scipy.spatial.transform import Rotation
-from safer_stack.utils import pointcloud2_2_npxyz
-
-# from utils import BaseAlgorithm
-
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn import linear_model
 
-from ground_segmenter import Plane, PlaneObstacleSegmenter
+# Safer Stack
+from safer_stack.utils import pointcloud2_2_npxyz
+from safer_stack.segmenter import Plane, PlaneObstacleSegmenter
+
 
 class CameraDistOdom:
 
@@ -30,11 +34,13 @@ class CameraDistOdom:
         crest_topic='/crest', color_img_topic='/camera/', 
         image_topic='/bumblebee2/left/image_rect',
         image_color_topic='/bumblebee2/left/image_rect_color',
-        lidar_cloud_topic='/velodyne/point_cloud_transformed',
+        lidar_cloud_topic='/lidar/point_cloud_transformed',
         camera_cloud_topic='/bumblebee2/point_cloud_transformed',
         odom_topic='/odom',
-        crest_cloud_topic='/rtabmap/crest_cloud'):
+        crest_cloud_topic='/rtabmap/crest_cloud',
+        alg_num=0):
 
+        self.alg_num = alg_num
         self.pub_rate = pub_rate
         self.gray_img = None
         self.color_img = None
@@ -48,7 +54,8 @@ class CameraDistOdom:
         self.seq = 0
 
         self.d = np.float('nan')
-        self.crest = np.zeros(shape=(1,), dtype=np.float)
+        self.crest = None
+        self.crest_cloud = None
 
         self.bridge = CvBridge()
         self.pub_dist = rospy.Publisher(edge_topic, Float32, queue_size=10)
@@ -466,17 +473,28 @@ class CameraDistOdom:
         if self.position is None: return
         if self.R is None: return
 
-        self.detect_crest3()
-        self.pub_crest.publish(self.crest)
-
+        if self.alg_num == 0:
+            self.detect_crest0()
+        elif self.alg_num == 1:
+            self.detect_crest1()
+        elif self.alg_num == 2:
+            self.detect_crest2()
+        elif self.alg_num == 3:
+            self.detect_crest3()
+        
+        if self.crest is not None:
+            self.pub_crest.publish(self.crest)
+        if self.crest_cloud is not None:
+            crest_cloud_msg = pc2.create_cloud_xyz32(header, self.crest_cloud)
+            self.pub_crest_cloud.publish(crest_cloud_msg)
+        
         header = Header()
         header.frame_id = 'base_link'
         header.seq = self.seq
         self.seq += 1
         header.stamp = rospy.Time.now()
         # print(self.crest_cloud)
-        crest_cloud_msg = pc2.create_cloud_xyz32(header, self.crest_cloud)
-        self.pub_crest_cloud.publish(crest_cloud_msg)
+
 
         dmsg = Float32()
         dmsg.data = self.d
@@ -489,7 +507,15 @@ class CameraDistOdom:
             rate.sleep()
             self.publish()
 
-def listener():
+def main():
+    argv = rospy.myargv(argv=sys.argv)
+    
+    if len(argv) == 2:
+        alg_num = int(argv[1])
+    elif len(argv) == 1:
+        alg_num = 0
+    else:
+        raise ValueError('This node expects only one argument.')
     
     rospy.init_node('distance_camera', anonymous=True)
 
@@ -498,10 +524,10 @@ def listener():
         edge_topic='/rtabmap/edge_distance',
         crest_topic='/rtabmap/crest',
         crest_cloud_topic='/rtabmap/crest_cloud',
-        camera_cloud_topic='/rtabmap/cloud_ground'
-        )
+        camera_cloud_topic='/rtabmap/cloud_ground',
+        alg_num=alg_num)
     distcamera.run()
     
 
 if __name__ == '__main__':
-    listener()
+    main()

@@ -485,14 +485,15 @@ class CameraDistOdom:
         if self.crest is not None:
             self.pub_crest.publish(self.crest)
         if self.crest_cloud is not None:
+            header = Header()
+            header.frame_id = 'base_link'
+            header.seq = self.seq
+            self.seq += 1
+            header.stamp = rospy.Time.now()
             crest_cloud_msg = pc2.create_cloud_xyz32(header, self.crest_cloud)
             self.pub_crest_cloud.publish(crest_cloud_msg)
         
-        header = Header()
-        header.frame_id = 'base_link'
-        header.seq = self.seq
-        self.seq += 1
-        header.stamp = rospy.Time.now()
+
         # print(self.crest_cloud)
 
 

@@ -10,13 +10,13 @@
     <!-- <include file="$(find safer_stack)/launch/spawn/spawn_husky.launch">
         <arg name="urdf_extras" value="$(find safer_stack)/urdf/$(arg urdf).urdf.xacro" />
     </include> -->
-    <include file="$(find safer_stack)/launch/devel/spawn_objects.launch">
+    <include file="$(find safer_stack)/launch/spawn/spawn_objects.launch">
     </include>
     
     <include file="$(find safer_stack)/launch/utils/process_camera.launch" />
 
     <rosparam command="load" file="$(find safer_stack)/config/detection.yaml" />
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/viz_all.rviz" output="screen"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find safer_stack)/rviz/object_detection.rviz" output="screen"/>
 
 </launch>

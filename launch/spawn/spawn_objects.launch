@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- <include file="$(find safer_stack)/launch/spawn/spawn_sdf.launch">
+        <arg name="robot_name" value="sand_mine" />
+        <arg name="x" value="0.0" />
+        <arg name="y" value="0.0" />
+        <arg name="z" value="0.0" />
+        <arg name="roll" value="0.0"/>
+        <arg name="pitch" value="0.0"/>
+        <arg name="yaw" value="0.0" />
+        <arg name="sdf_robot_file" value="$(find safer_stack)/models/sand_mine/model.sdf" />
+    </include> -->
+
+    <include file="$(find safer_stack)/launch/devel/husky_path.launch">
+    </include>
+
+    <include file="$(find safer_stack)/launch/spawn/spawn_sdf.launch">
+        <arg name="robot_name" value="person_standing" />
+        <arg name="x" value="8.0"/>
+        <arg name="y" value="10.0"/>
+        <arg name="z" value="8.0"/>
+        <arg name="roll" value="0.0"/>
+        <arg name="pitch" value="0.0"/>
+        <arg name="yaw" value="1.92" />
+        <arg name="sdf_robot_file" value="$(find safer_stack)/models/person_standing/model.sdf" />
+    </include>
+
+    <include file="$(find safer_stack)/launch/spawn/spawn_sdf.launch">
+        <arg name="robot_name" value="bus" />
+        <arg name="x" value="6.0"/>
+        <arg name="y" value="15.0"/>
+        <arg name="z" value="8"/>
+        <arg name="roll" value="0.0"/>
+        <arg name="pitch" value="0.0"/>
+        <arg name="yaw" value="1.92" />
+        <arg name="sdf_robot_file" value="$(find safer_stack)/models/bus/model.sdf" />
+    </include>
+
+</launch>

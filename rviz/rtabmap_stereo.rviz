@@ -4,11 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
-        - /PointCloud21
-        - /PointCloud22
-      Splitter Ratio: 0.5
+        - /Ground1
+      Splitter Ratio: 0.49527186155319214
     Tree Height: 1555
   - Class: rviz/Selection
     Name: Selection
@@ -28,7 +25,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -182,7 +179,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: PointCloud2
+      Name: Ground
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
@@ -212,7 +209,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: PointCloud2
+      Name: Obstacles
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
@@ -228,7 +225,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: map
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -252,7 +249,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 49.451011657714844
+      Distance: 21.35869598388672
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -267,10 +264,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.25539860129356384
+      Pitch: 0.3603985905647278
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.6204042434692383
+      Yaw: 2.6204047203063965
     Saved: ~
 Window Geometry:
   Displays:

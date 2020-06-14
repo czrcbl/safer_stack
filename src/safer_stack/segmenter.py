@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn import linear_model
-from safer_stack.utils import pointcloud2_2_npxyz
 
 
 class Plane:

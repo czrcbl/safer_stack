@@ -75,6 +75,14 @@ class Bbox(object):
     @property
     def xy_width_height(self):
         return np.array([self.x1, self.y1, self.x2 - self.x1, self.y2 - self.y1])
+    
+    @property
+    def height(self):
+        return self.y2 - self.y1
+    
+    @property
+    def width(self):
+        return self.x2 - self.x1
 
     def copy(self):
         return deepcopy(self)
@@ -370,89 +378,3 @@ class SegList(list):
                 )
             out.append(seg)
         return out
-
-    # def draw_bboxes(self, img, copy=True):
-    #     if copy:
-    #         img = np.copy(img)
-    #     for seg in self[::-1]:
-    #         img = seg.draw_bbox(img, copy=False)
-
-    #     return img
-
-    # def crop_bboxes(self, arr):
-    #     out = []
-    #     for seg in self:
-    #         out.append(seg.crop_bbox(arr))
-    #     return out
-
-
-
-# class SegInstance2(object):
-#     def __init__(self, class_name,  _id, score, bbox, mask):
-#         self.class_name = class_name
-#         self.score = score
-#         self.class_id = _id
-#         self.bbox = bbox
-#         self.mask = mask
-
-#     def __repr__(self):
-#         return 'SegInstance(name={}, _id={}, score={}, bbox={}, mask=...)'.format(self.class_name, self.class_id, self.score, self.bbox)
-
-#     @property
-#     def x1(self):
-#         return self.bbox[0]
-
-#     @property
-#     def x2(self):
-#         return self.bbox[2]
-
-#     @property
-#     def y1(self):
-#         return self.bbox[1]
-
-#     @property
-#     def y2(self):
-#         return self.bbox[3]
-
-#     def draw_bbox(self, img, copy=True):
-#         """Draw bbox on image, expect an int image"""
-#         if copy:
-#             img = np.copy(img)
-#         height, width = img.shape[:2]
-#         # if (self.parent is not None) and (self.parent.all_classes is not None):
-#         #     color = plt.get_cmap('hsv')(self.class_id / len(self.parent.all_classes))
-#         # else:
-#         color = plt.get_cmap('hsv')(self.class_id / 80.0) # Number of classes on COCO
-#         color = [x * 255 for x in color]
-#         thickness = 1 + int(img.shape[1]/300)
-#         cv2.rectangle(img, (int(self.x1), int(self.y1)), (int(self.x2), int(self.y2)), color, thickness)
-#         text = '{} {:d}%'.format(self.class_name, int(self.score * 100))
-#         font_scale = 0.5/600 * width
-#         thickness = int(2/600 * width)
-#         vert = 10/1080 * height
-#         cv2.putText(img, text, (int(self.x1), int(self.y1 - vert)), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, thickness)
-        
-#         return img
-
-#     def crop_bbox(self, img, border=0.0):
-#         """Return the original image cropped on the bounding box limits
-#         border: percentage of the bounding box width and height to enlager the bbox
-#         """
-#         h, w = img.shape[:2]
-        
-#         # percentage of bbox dimensions
-#         bbh, bbw = self.y2 - self.y1, self.x2 - self.x1
-#         i1 = int(np.max([0, self.y1 - bbh * border / 2.0]))
-#         i2 = int(np.min([h, self.y2 + bbh * border / 2.0]))
-#         j1 = int(np.max([0, self.x1 - bbw * border / 2.0]))
-#         j2 = int(np.min([w, self.x2 + bbw * border / 2.0]))
-#         cropped = img[i1: i2, j1: j2]
-
-#         # # percentage of total image dimensions
-#         # i1 = int(np.max([0, self.y1 - h * border / 2.0]))
-#         # i2 = int(np.min([h, self.y2 + h * border / 2.0]))
-#         # j1 = int(np.max([0, self.x1 - w * border / 2.0]))
-#         # j2 = int(np.min([w, self.x2 + w * border / 2.0]))
-#         # cropped = img[i1: i2, j1: j2]
-
-#         return cropped

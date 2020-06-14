@@ -111,6 +111,30 @@ rosrun safer_stack control_husky.py lidar
 
 The robot should stop at 7 meters from the crest of the pile.
 
-### 
+### Simulation with Rtabmap
+
+In separate terminal run the following commands in the following order:
+``` bash
+roslaunch safer_stack sim_rtabmap_stereo.launch
+
+roslaunch safer_stack rtabmap_stereo.launch
+
+rosrun safer_stack distance_camera_ground.py 0
+
+rosrun safer_stack control_husky.py rtabmap
+```
+
+To reset husky position and delete the map, run:
+```bash
+rosrun safer_stack reset_simulation.py
+```
+
+
+### Object Detection and Tracking
  
+``` bash
+roslaunch safer_stack sim_base_with_objects.launch
+
+rosrun safer_stacl
+```
   

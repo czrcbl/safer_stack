@@ -4,7 +4,6 @@ from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
 from rospy.numpy_msg import numpy_msg
-from apriltag_ros.msg import AprilTagDetectionArray
 import numpy as np
 import cv2
 from cv_bridge import CvBridge, CvBridgeError

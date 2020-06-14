@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 # Crete a container with the recomended options.
-# Note that the /home/ros folder of the container will
-# be mounted on /home/Docker/safer_stack on host
+# Note that the ~/Docker/safer_stack on host will
+# be mounted on /home/ros folder on the container
 rosVersion=melodic
 containerName=ssm
 imageName=safer_stack:melodic

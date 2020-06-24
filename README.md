@@ -132,9 +132,20 @@ rosrun safer_stack reset_simulation.py
 
 ### Object Detection and Tracking
  
+In this scenario, a fow object were placed on the mine environment.
+To run a simulation with only object detection, run the following commands:
 ``` bash
 roslaunch safer_stack sim_base_with_objects.launch
-
-rosrun safer_stacl
+rosrun safer_stack detection.py
 ```
+
+In order to run the simulation with tracking, run:
+
+``` bash
+roslaunch safer_stack sim_base_with_objects.launch
+rosrun safer_stack det_n_track.py
+```
+
+
+
   

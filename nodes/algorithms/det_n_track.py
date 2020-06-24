@@ -131,56 +131,25 @@ class ObstacleNN:
         if self.color_img is None: return
         if self.camera_cloud is None: return
 
-        # im = self.color_img[:, :, ::-1] # Convert to BGR
-        im = self.color_img # Keep RGB
-        
-        # plt.imshow(im)
-        # plt.show()
+        im = self.color_img[:, :, ::-1] # Convert to BGR
+        # im = self.color_img # Keep RGB
         
         cloud = self.camera_cloud
         th = 0.7
         
-        ##############################
 
-        # if (self.iter % self.frames_per_det) == 0:
-
-        #     tic = time.time()
-
-        #     if self.model_type == 'detection':
-        #         bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
-                
-        #     elif self.model_type == 'segmentation':
-        #         seglist, bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
-
-        #     print('Model Execution Time:', time.time() - tic)
-            
-        #     bboxlist = bboxlist.remove_overlap()
-            
-        #     bboxlist = self.tracker.update(im, bboxlist)
-
-        # else:
-        #     bboxlist = self.tracker.update(im)
-        
-        # self.iter += 1
-
-        ##########################3
-
-        # if self.model_type == 'detection':
-        #     bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
-            
-        # elif self.model_type == 'segmentation':
-        #     seglist, bboxlist, npim = self.predictor.detect(im, th=th, keep_size=True)
-
-        ############################
 
 
         
         bboxlist = self.tracker.update(im, bboxlist=self.predictions)
         self.predictions = None
        
-        dists = compute_distances(cloud, bboxlist, im.shape[:2])
+        dists = compute_distances(cloud, bboxlist)
         print(dists)
-        dim = bboxlist.draw(im)
+        dim = np.array(im)
+        for bbox, dist in zip(bboxlist, [d[1] for d in dists]):
+            dim = bbox.draw(dim, extra_text='{} m'.format(dist))
+        # dim = bboxlist.draw(im)
         # tbboxes = self.tracker.track(bboxlist)
         # dim = tbboxes.draw(npim)
     
@@ -188,7 +157,8 @@ class ObstacleNN:
         fps = self.fps()
         print('FPS:', fps)
 
-        cv2.imshow('Segmentation', dim[:,:,::-1])
+        cv2.imshow('Detection and Tracking', dim)
+        # cv2.imshow('Segmentation', dim[:,:,::-1]) # Image in RGB
         cv2.waitKey(3)
 
 

@@ -163,14 +163,14 @@ class Bbox(object):
   
         return out
     
-    def draw(self, img, copy=True, extra_text=''):
+    def draw(self, img, copy=False, extra_text=''):
         """Draw bbox on image, expect an int image"""
 
         if img.dtype == np.float:
             img = (img * 255).astype(np.uint8)
         elif img.dtype == np.uint8:
             if copy:
-                img = np.copy(img)
+                img = np.array(img, dtype=np.uint8)
         else:
             raise ValueError('Image of type {} should be a float or uint8 array.'.format(img.dtype))   
         
@@ -179,7 +179,7 @@ class Bbox(object):
             color = plt.get_cmap('hsv')(self.class_id / len(self.parent.all_classes))
         else:
             color = plt.get_cmap('hsv')(self.class_id / 80) # Number of classes on COCO
-        color = [x * 255 for x in color]
+        color = tuple([int(x * 255) for x in color])
         thickness = 1 + int(img.shape[1]/300)
         cv2.rectangle(img, (int(self.x1), int(self.y1)), (int(self.x2), int(self.y2)), color, thickness)
         if self.id is None:
@@ -190,6 +190,7 @@ class Bbox(object):
         thickness = int(2/600 * width)
         vert = 10/1080 * height
         cv2.putText(img, text, (int(self.x1), int(self.y1 - vert)), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, thickness)
+        
         return img
 
     def iou(self, other):
